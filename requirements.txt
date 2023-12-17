@@ -1,22 +1,19 @@
-# Core libraries
+# Core Python libraries for data handling
 pandas
 numpy
-matplotlib
 
 # For technical analysis
-TA-Lib
+TA-Lib  # Ensure you have the TA-Lib library installed at the system level
 
-# Machine learning
+# Machine learning and statistical analysis
+scipy
 scikit-learn
 
-# For Binance API integration
+# For Binance API interaction
 python-binance
 
-# Additional libraries you might find useful
-requests
-python-dotenv  # For .env file handling
+# For plotting and visualization
+matplotlib
 
-# Specific libraries for technical analysis indicators
-ta  # Technical Analysis Library in Python
-
-#Please note, installing TA-Lib might require additional steps, especially on Windows. You may need to download and install the TA-Lib binary corresponding to your operating system from here before running pip install TA-Lib.
+# Additional utility libraries
+python-dotenv  # For loading environment variables from .env files
