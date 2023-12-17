@@ -1,0 +1,15 @@
+Instructions for Users:
+Install Python: Ensure Python (version 3.6 or higher) is installed on your system. It can be downloaded from python.org.
+
+Install Dependencies: Run pip install -r requirements.txt to install all the necessary Python libraries.
+
+Note: TA-Lib might require additional steps to install, especially on Windows. Users may need to download and install the TA-Lib binary from TA-Lib before running pip install TA-Lib.
+Binance API Keys: Store your Binance API key and secret in the BinanceAPI.env file. Make sure this file is never shared or uploaded to public repositories for security reasons.
+
+Run fetch_historical_data.py: This script fetches historical data for BTC, ETH, and XRP and stores it in the data/ directory.
+
+Run main.py: After fetching the data, run the main.py script to simulate trades based on the strategies implemented in the strategies/ directory.
+
+Analyze Results with analysis/analysis.py: Finally, run the analysis.py script in the analysis/ directory to analyze the trading performance and visualize the results.
+
+Review Additional Documentation: Refer to README.md, LICENSE, and CONTRIBUTING.md for more information on the project, usage guidelines, and how to contribute.
