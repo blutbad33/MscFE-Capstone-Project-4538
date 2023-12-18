@@ -1,4 +1,4 @@
-# Core Python libraries for data handling
+# Core Python libraries needed for data handling
 pandas
 numpy
 
@@ -15,5 +15,5 @@ python-binance
 # For plotting and visualization
 matplotlib
 
-# Additional utility libraries
+# Additional utility libraries and Environment Variables
 python-dotenv  # For loading environment variables from .env files
