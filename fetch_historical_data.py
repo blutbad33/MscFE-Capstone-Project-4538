@@ -5,7 +5,7 @@ import pandas as pd
 api_key = 'rbQFZbq8uQIfVDUVciOyxGjjSTRYzzMt5ca9Xsarys5i9fZMaQZvgqWy17XDpRGU'
 api_secret = 'fV5xqoD2BzZ8KbO95Ug6vOC59UoHAabSquDBEv6Y4B7x4I32Q32Me7mdalrDog4V'
 
-# Initialize the client
+# Initialize the client; to submit security credentials to the Binance API Server
 client = Client(api_key, api_secret)
 
 # Define function to fetch historical data
@@ -20,7 +20,7 @@ btc_data = fetch_historical_data('BTCUSDT', '1 Jan, 2018', '30 Oct, 2023')
 eth_data = fetch_historical_data('ETHUSDT', '1 Jan, 2018', '30 Oct, 2023')
 xrp_data = fetch_historical_data('XRPUSDT', '1 Jan, 2018', '30 Oct, 2023')
 
-# Save data to the data/ directory
+# Save data to the data/ directory; these are directory to call locally for the data already fetched. 
 btc_data.to_csv('data/BTC_data.csv', index=False)
 eth_data.to_csv('data/ETH_data.csv', index=False)
 xrp_data.to_csv('data/XRP_data.csv', index=False)
