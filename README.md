@@ -106,6 +106,6 @@ If you encounter any issues, please check the [GitHub issues page](https://githu
 ## Maintainers
 
 - [Sydney Ampaire](https://github.com/blutbad33/)
-- [Opeyemi Praise] (https://github.com/opeyemipraise)
+- [Opeyemi Praise](https://github.com/opeyemipraise)
 - 
 ```
