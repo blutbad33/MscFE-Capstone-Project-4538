@@ -17,7 +17,7 @@ dist/
 env/
 venv/
 
-# Spyder project settings
+# Here's the settings on Spyder project settings
 .spyderproject
 .spyproject
 
