@@ -10,10 +10,12 @@ initial_capital = 10000
 trading_pairs = ['BTCUSDT', 'ETHUSDT', 'XRPUSDT']
 trade_results = []
 
+# Load Crypto Pairs
 def load_data(pair):
     filename = f'data/{pair}_data.csv'
     return pd.read_csv(filename, parse_dates=['timestamp'])
 
+# Define Simulate Trade of the Technical Analysis Strategy
 def simulate_trades(data, strategy_name, pair, initial_capital):
     capital = initial_capital
     position = 0
@@ -59,6 +61,7 @@ def simulate_trades(data, strategy_name, pair, initial_capital):
 
     final_capital = capital + position * data['close'].iloc[-1]
     return final_capital
+
 
 def main():
     for pair in trading_pairs:
