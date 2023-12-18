@@ -1,10 +1,10 @@
 # config.py
 
-# Binance API configuration
+# Configuration for Binance API Calls
 API_KEY = 'rbQFZbq8uQIfVDUVciOyxGjjSTRYzzMt5ca9Xsarys5i9fZMaQZvgqWy17XDpRGU'
 API_SECRET = 'fV5xqoD2BzZ8KbO95Ug6vOC59UoHAabSquDBEv6Y4B7x4I32Q32Me7mdalrDog4V'
 
-# Trading configuration
+# Trading configuration with 1hour trading interval configuration
 TRADING_PAIRS = ['BTCUSDT', 'ETHUSDT', 'XRPUSDT']  # Cryptocurrency pairs to trade
 TRADE_INTERVAL = '1h'  # Trading interval
 
