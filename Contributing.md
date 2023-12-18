@@ -5,9 +5,9 @@ We welcome contributions to the Cryptocurrency Short-Term Trading Model project!
 
 ## How to Contribute
 
-1. **Fork the Repository**: Start by forking the repository on GitHub.
+1. **Feel free to fork the Repository**: Start by forking the repository on GitHub.
 
-2. **Clone Your Fork**: Clone your fork to your local machine:
+2. **Clone Your Fork and add your own ideas**: Clone your fork to your local machine:
 
    ```bash
    git clone https://github.com/blutbad33/MscFE-Capstone-Project-4538/new/main.git
