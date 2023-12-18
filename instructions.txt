@@ -10,6 +10,6 @@ Run fetch_historical_data.py: This script fetches historical data for BTC, ETH, 
 
 Run main.py: After fetching the data, run the main.py script to simulate trades based on the strategies implemented in the strategies/ directory.
 
-Analyze Results with analysis/analysis.py: Finally, run the analysis.py script in the analysis/ directory to analyze the trading performance and visualize the results.
+Analyze Results with analysis/analysis.py: Finally, run the analysis.py script in the analysis/ directory to analyze the trading performance and visualize the results. You will be able to visualize the technical strategies for the 3 cryptocurrencies. 
 
 Review Additional Documentation: Refer to README.md, LICENSE, and CONTRIBUTING.md for more information on the project, usage guidelines, and how to contribute.
