@@ -3,12 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import zscore
 
-# Load trade results
+# Here's where you load trade results
 df = pd.read_csv('trade_results.csv')
 df['Date/Time of Trade'] = pd.to_datetime(df['Date/Time of Trade'])
 df['Week'] = df['Date/Time of Trade'].dt.isocalendar().week
 
-# Function to calculate various metrics
+# These are the functions to calculate various metrics needed
 def analyze_trades(data):
     num_trades = len(data)
     num_profit_trades = len(data[data['Profit/Loss'] > 0])
@@ -22,7 +22,7 @@ def analyze_trades(data):
     num_short_trades = len(data[data['Trade Type'] == 'Sell'])
     drawdown = (data['Cumulative Profit/Loss'].cummax() - data['Cumulative Profit/Loss']).max()
 
-    # Calculating additional metrics like Sharpe ratio, Time weighted Return, Standard deviation, Z-score
+    # Here we calculate additional metrics like Sharpe ratio, Time weighted Return, Standard deviation, Z-score
     daily_returns = data['Profit/Loss'].pct_change()
     sharpe_ratio = daily_returns.mean() / daily_returns.std() * np.sqrt(252)
     time_weighted_return = np.prod(1 + daily_returns) - 1
