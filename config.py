@@ -9,20 +9,20 @@ TRADING_PAIRS = ['BTCUSDT', 'ETHUSDT', 'XRPUSDT']  # Cryptocurrency pairs to tra
 TRADE_INTERVAL = '1h'  # Trading interval
 
 # Technical analysis settings for RSI and Moving Average Strategy
-RSI_PERIOD = 14  # Period for Relative Strength Index
-OVERBOUGHT_RSI = 70
+RSI_PERIOD = 10  # Period for Relative Strength Index
+OVERBOUGHT_RSI = 60
 OVERSOLD_RSI = 30
-SHORT_TERM_MA_PERIOD = 9  # Period for short-term EMA
-LONG_TERM_MA_PERIOD = 21  # Period for long-term EMA
+SHORT_TERM_MA_PERIOD = 5  # Period for short-term EMA
+LONG_TERM_MA_PERIOD = 10  # Period for long-term EMA
 
 # Technical analysis settings for Bollinger Bands and RSI Strategy
-BOLLINGER_BANDS_PERIOD = 20  # Period for Bollinger Bands
+BOLLINGER_BANDS_PERIOD = 15  # Period for Bollinger Bands
 BOLLINGER_BANDS_STD_DEV = 2  # Standard deviation for Bollinger Bands
 
 # Risk management
 INITIAL_CAPITAL = 10000  # Starting capital in USD
-RISK_PER_TRADE = 0.5  # Risk 0.5% of account balance per trade
-STOP_LOSS_PERCENTAGE = 0.5  # Stop loss percentage set to 0.5% per trade
+RISK_PER_TRADE = 0.05  # Risk 0.5% of account balance per trade
+STOP_LOSS_PERCENTAGE = 0.05  # Stop loss percentage set to 0.5% per trade
 TAKE_PROFIT_PERCENTAGE = 1  # Take profit percentage set to 1% per trade
 
 # Other configurations
