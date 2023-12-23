@@ -19,39 +19,35 @@ def load_data(pair):
 def simulate_trades(data, strategy_name, pair, initial_capital):
     capital = initial_capital
     position = 0
-    cumulative_pnl = 0
+    cumulative_pnl = 10000  # Start with initial capital
 
     for i in range(1, len(data)):
         timestamp = data['timestamp'].iloc[i]
         close_price = data['close'].iloc[i]
         trade_size = 0
         entry_price = 0
-        exit_price = 0
+        exit_price = None
         profit_loss = 0
-        position_status = 'Hold'
+        position_status = 'Open'
 
         if data['Buy'].iloc[i] and capital > 0:
             trade_size = capital / close_price
             entry_price = close_price
             position = trade_size
             capital = 0
-            position_status = 'Open'
         elif data['Sell'].iloc[i] and position > 0:
             exit_price = close_price
-            capital = position * close_price
-            profit_loss = (exit_price - entry_price) * trade_size
+            profit_loss = trade_size * (exit_price - entry_price)
             cumulative_pnl += profit_loss
             position = 0
             trade_size = 0
-            position_status = 'Close'
+            position_status = 'Closed'
 
-        if position_status in ['Open', 'Close']:
+        if exit_price is not None or position_status == 'Open':
             trade_results.append({
                 'Date/Time of Trade': timestamp,
                 'Strategy Identifier': strategy_name,
                 'Trading Pair': pair,
-                'Trade Type': 'Buy' if position_status == 'Open' else 'Sell',
-                'Trade Size': trade_size,
                 'Entry Price': entry_price,
                 'Exit Price': exit_price,
                 'Profit/Loss': profit_loss,
@@ -59,9 +55,8 @@ def simulate_trades(data, strategy_name, pair, initial_capital):
                 'Position Status': position_status
             })
 
-    final_capital = capital + position * data['close'].iloc[-1]
+    final_capital = capital + position * data['close'].iloc[-1] if position > 0 else capital
     return final_capital
-
 
 def main():
     for pair in trading_pairs:
