@@ -15,18 +15,17 @@ def load_data(pair):
     filename = f'{pair}_data.csv'
     return pd.read_csv(filename, parse_dates=['timestamp'])
 
-# Define Simulate Trade of the Technical Analysis Strategy
 def simulate_trades(data, strategy_name, pair, initial_capital):
     capital = initial_capital
     position = 0
     cumulative_pnl = 10000  # Start with initial capital
+    entry_price = None
     entry_time = None
 
     for i in range(1, len(data)):
         timestamp = data['timestamp'].iloc[i]
         close_price = data['close'].iloc[i]
         trade_size = 0
-        entry_price = None
         exit_price = None
         profit_loss = 0
         position_status = 'Closed'  # Default to 'Closed'
@@ -37,7 +36,7 @@ def simulate_trades(data, strategy_name, pair, initial_capital):
             entry_time = timestamp
             position = trade_size
             capital = 0
-        elif data['Sell'].iloc[i] and position > 0:
+        elif data['Sell'].iloc[i] and position > 0 and entry_price is not None:
             exit_price = close_price
             profit_loss = trade_size * (exit_price - entry_price)
             cumulative_pnl += profit_loss
