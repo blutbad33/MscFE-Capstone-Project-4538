@@ -1,59 +1,75 @@
 import pandas as pd
-import config
-from datetime import timedelta
+import os
+from strategies.rsi_ma_strategy import rsi_ma_strategy
+from strategies.bollinger_rsi_strategy import bollinger_rsi_strategy
 
-def bollinger_rsi_strategy(data):
-    # Calculate Bollinger Bands using parameters from config.py
-    window = config.BOLLINGER_BANDS_PERIOD
-    std_dev = config.BOLLINGER_BANDS_STD_DEV
-    data['MA20'] = data['close'].rolling(window=window).mean()
-    data['BB_std'] = data['close'].rolling(window=window).std()
-    data['upper_band'] = data['MA20'] + (data['BB_std'] * std_dev)
-    data['lower_band'] = data['MA20'] - (data['BB_std'] * std_dev)
+# Initial setup
+initial_capital = 10000
+trading_pairs = ['BTCUSDT', 'ETHUSDT', 'XRPUSDT']
+trade_results = []
 
-    # Calculate the RSI using period from config.py
-    rsi_period = config.RSI_PERIOD
-    delta = data['close'].diff()
-    gain = (delta.where(delta > 0, 0)).rolling(window=rsi_period).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(window=rsi_period).mean()
-    rs = gain / loss
-    data['RSI'] = 100 - (100 / (1 + rs))
+# Load Crypto Pairs
+def load_data(pair):
+    filename = f'{pair}_data.csv'
+    return pd.read_csv(filename, parse_dates=['timestamp'])
 
-    # Generate signals with additional conditions
-    for i in range(len(data)):
-        data.loc[i, 'Buy'] = False
-        data.loc[i, 'Sell'] = False
-        if i > 0 and not pd.isnull(data.loc[i, 'RSI']):
-            # Buy condition
-            if data.loc[i, 'close'] < data.loc[i, 'lower_band'] and data.loc[i, 'RSI'] < 30:
-                data.loc[i, 'Buy'] = True
-                # Check for sell condition within 1 day
-                sell_date = data.loc[i, 'timestamp'] + timedelta(days=1)
-                sell_index = data[(data['timestamp'] >= sell_date)].index.min()
-                if sell_index and sell_index < len(data):
-                    data.loc[sell_index, 'Sell'] = True
-            # Sell condition
-            elif data.loc[i, 'close'] > data.loc[i, 'upper_band'] and data.loc[i, 'RSI'] > 70:
-                data.loc[i, 'Sell'] = True
+def simulate_trades(data, strategy_name, pair, initial_capital):
+    capital = initial_capital
+    position = 0
+    cumulative_pnl = initial_capital  # Start with initial capital
+    entry_price = None
+    entry_time = None
+    trade_size = 0
 
-    # Trade size calculation (an example approach)
-    data['Trade Size'] = data.apply(lambda row: calculate_trade_size(row['timestamp'], row['close']), axis=1)
+    for i in range(1, len(data)):
+        timestamp = data['timestamp'].iloc[i]
+        close_price = data['close'].iloc[i]
+        exit_price = None
+        profit_loss = 0
+        position_status = 'Closed'  # Default to 'Closed'
 
-    return data
+        if data['Buy'].iloc[i] and capital > 0 and not position:
+            trade_size = capital / close_price
+            entry_price = close_price
+            entry_time = timestamp
+            position = trade_size
+            capital = 0
+        elif data['Sell'].iloc[i] and position > 0 and entry_price is not None:
+            exit_price = close_price
+            profit_loss = trade_size * (exit_price - entry_price)
+            cumulative_pnl += profit_loss
+            position = 0
+            trade_size = 0
+            trade_time = f'{entry_time.strftime("%d/%m/%Y %H:%M")} - {timestamp.strftime("%d/%m/%Y %H:%M")}'
+            trade_results.append({
+                'Date/Time of Trade': trade_time,
+                'Strategy Identifier': strategy_name,
+                'Trading Pair': pair,
+                'Trade Size': trade_size,
+                'Entry Price': entry_price,
+                'Exit Price': exit_price,
+                'Profit/Loss': profit_loss,
+                'Cumulative Profit/Loss': cumulative_pnl,
+                'Position Status': position_status
+            })
 
-def calculate_trade_size(timestamp, price):
-    # Example trade size calculation based on volatility or other factors
-    # Adjust this function according to your strategy
-    if timestamp.hour < 12:
-        return config.INITIAL_CAPITAL * 0.01  # 1% of capital for morning trades
-    else:
-        return config.INITIAL_CAPITAL * 0.02  # 2% of capital for afternoon trades
+    final_capital = capital + position * data['close'].iloc[-1] if position > 0 else capital
+    return final_capital
 
-# Example usage
+def main():
+    for pair in trading_pairs:
+        data = load_data(pair)
+
+        # Apply and simulate RSI and MA strategy
+        strategy_data = rsi_ma_strategy(data.copy())
+        simulate_trades(strategy_data, 'RSI_MA', pair, initial_capital)
+
+        # Apply and simulate Bollinger Bands and RSI strategy
+        strategy_data = bollinger_rsi_strategy(data.copy())
+        simulate_trades(strategy_data, 'Bollinger_RSI', pair, initial_capital)
+
+    # Save trade results to CSV
+    pd.DataFrame(trade_results).to_csv('trade_results.csv', index=False)
+
 if __name__ == "__main__":
-    # Load data and apply strategy (assuming data is loaded correctly)
-    data = pd.DataFrame()  # Replace with actual data loading logic
-    strategy_data = bollinger_rsi_strategy(data)
-
-# Example usage
-# updated_data = bollinger_rsi_strategy(data)
+    main()
