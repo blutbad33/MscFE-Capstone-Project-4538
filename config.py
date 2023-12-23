@@ -20,9 +20,10 @@ BOLLINGER_BANDS_PERIOD = 20  # Period for Bollinger Bands
 BOLLINGER_BANDS_STD_DEV = 2  # Standard deviation for Bollinger Bands
 
 # Risk management
-MAX_TRADE_QUANTITY = 10  # Maximum quantity to trade
-STOP_LOSS_PERCENTAGE = 5  # Stop loss percentage
-TAKE_PROFIT_PERCENTAGE = 10  # Take profit percentage
+INITIAL_CAPITAL = 10000  # Starting capital in USD
+RISK_PER_TRADE = 0.5  # Risk 0.5% of account balance per trade
+STOP_LOSS_PERCENTAGE = 0.5  # Stop loss percentage set to 0.5% per trade
+TAKE_PROFIT_PERCENTAGE = 1  # Take profit percentage set to 1% per trade
 
 # Other configurations
 LOG_LEVEL = 'INFO'  # Logging level (DEBUG, INFO, WARNING, ERROR)
