@@ -1,7 +1,5 @@
 import pandas as pd
 import os
-
-# Import strategies
 from strategies.rsi_ma_strategy import rsi_ma_strategy
 from strategies.bollinger_rsi_strategy import bollinger_rsi_strategy
 
@@ -18,14 +16,14 @@ def load_data(pair):
 def simulate_trades(data, strategy_name, pair, initial_capital):
     capital = initial_capital
     position = 0
-    cumulative_pnl = 10000  # Start with initial capital
+    cumulative_pnl = initial_capital  # Start with initial capital
     entry_price = None
     entry_time = None
+    trade_size = 0
 
     for i in range(1, len(data)):
         timestamp = data['timestamp'].iloc[i]
         close_price = data['close'].iloc[i]
-        trade_size = 0
         exit_price = None
         profit_loss = 0
         position_status = 'Closed'  # Default to 'Closed'
@@ -47,6 +45,7 @@ def simulate_trades(data, strategy_name, pair, initial_capital):
                 'Date/Time of Trade': trade_time,
                 'Strategy Identifier': strategy_name,
                 'Trading Pair': pair,
+                'Trade Size': trade_size,
                 'Entry Price': entry_price,
                 'Exit Price': exit_price,
                 'Profit/Loss': profit_loss,
