@@ -20,19 +20,21 @@ def simulate_trades(data, strategy_name, pair, initial_capital):
     capital = initial_capital
     position = 0
     cumulative_pnl = 10000  # Start with initial capital
+    entry_time = None
 
     for i in range(1, len(data)):
         timestamp = data['timestamp'].iloc[i]
         close_price = data['close'].iloc[i]
         trade_size = 0
-        entry_price = 0
+        entry_price = None
         exit_price = None
         profit_loss = 0
-        position_status = 'Open'
+        position_status = 'Closed'  # Default to 'Closed'
 
-        if data['Buy'].iloc[i] and capital > 0:
+        if data['Buy'].iloc[i] and capital > 0 and not position:
             trade_size = capital / close_price
             entry_price = close_price
+            entry_time = timestamp
             position = trade_size
             capital = 0
         elif data['Sell'].iloc[i] and position > 0:
@@ -41,11 +43,9 @@ def simulate_trades(data, strategy_name, pair, initial_capital):
             cumulative_pnl += profit_loss
             position = 0
             trade_size = 0
-            position_status = 'Closed'
-
-        if exit_price is not None or position_status == 'Open':
+            trade_time = f'{entry_time.strftime("%d/%m/%Y %H:%M")} - {timestamp.strftime("%d/%m/%Y %H:%M")}'
             trade_results.append({
-                'Date/Time of Trade': timestamp,
+                'Date/Time of Trade': trade_time,
                 'Strategy Identifier': strategy_name,
                 'Trading Pair': pair,
                 'Entry Price': entry_price,
