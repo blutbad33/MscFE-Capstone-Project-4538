@@ -23,7 +23,7 @@ BOLLINGER_BANDS_STD_DEV = 2  # Standard deviation for Bollinger Bands
 INITIAL_CAPITAL = 10000  # Starting capital in USD
 RISK_PER_TRADE = 0.05  # Risk 0.5% of account balance per trade
 STOP_LOSS_PERCENTAGE = 0.05  # Stop loss percentage set to 0.5% per trade
-TAKE_PROFIT_PERCENTAGE = 1  # Take profit percentage set to 1% per trade
+TAKE_PROFIT_PERCENTAGE = 0.03  # Take profit percentage set to 1% per trade
 
 # Other configurations
 LOG_LEVEL = 'INFO'  # Logging level (DEBUG, INFO, WARNING, ERROR)
