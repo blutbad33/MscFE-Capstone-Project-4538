@@ -12,7 +12,7 @@ trade_results = []
 
 # Load Crypto Pairs
 def load_data(pair):
-    filename = f'data/{pair}_data.csv'
+    filename = f'{pair}_data.csv'
     return pd.read_csv(filename, parse_dates=['timestamp'])
 
 # Define Simulate Trade of the Technical Analysis Strategy
