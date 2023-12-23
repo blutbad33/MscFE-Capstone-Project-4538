@@ -1,7 +1,7 @@
 import pandas as pd
-import os
 from strategies.rsi_ma_strategy import rsi_ma_strategy
 from strategies.bollinger_rsi_strategy import bollinger_rsi_strategy
+from datetime import timedelta
 
 # Initial setup
 initial_capital = 10000
@@ -29,7 +29,7 @@ def simulate_trades(data, strategy_name, pair, initial_capital):
         position_status = 'Closed'  # Default to 'Closed'
 
         if data['Buy'].iloc[i] and capital > 0 and not position:
-            trade_size = capital / close_price
+            trade_size = capital / close_price  # Calculate trade size
             entry_price = close_price
             entry_time = timestamp
             position = trade_size
@@ -38,11 +38,12 @@ def simulate_trades(data, strategy_name, pair, initial_capital):
             exit_price = close_price
             profit_loss = trade_size * (exit_price - entry_price)
             cumulative_pnl += profit_loss
+            trade_duration = timestamp - entry_time
             position = 0
             trade_size = 0
-            trade_time = f'{entry_time.strftime("%d/%m/%Y %H:%M")} - {timestamp.strftime("%d/%m/%Y %H:%M")}'
             trade_results.append({
-                'Date/Time of Trade': trade_time,
+                'Date/Time of Trade': entry_time.strftime("%d/%m/%Y %H:%M") + ' - ' + timestamp.strftime("%d/%m/%Y %H:%M"),
+                'Trade Duration (hrs)': trade_duration.total_seconds() / 3600,
                 'Strategy Identifier': strategy_name,
                 'Trading Pair': pair,
                 'Trade Size': trade_size,
