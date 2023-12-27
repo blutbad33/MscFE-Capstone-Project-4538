@@ -13,14 +13,13 @@ def calculate_trade_size(cumulative_profit, entry_price, stop_loss_price):
     dollar_risk = cumulative_profit * config.RISK_PER_TRADE
     price_risk_per_unit = abs(entry_price - stop_loss_price)
     trade_size = dollar_risk / price_risk_per_unit
-    return trade_size, config.RISK_PER_TRADE
+    return trade_size  # Only returning trade_size
 
 def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
     capital = initial_capital
     cumulative_pnl = initial_capital  # Start with initial capital
     entry_price = None
     entry_time = None
-    trade_size = None
 
     for i in range(1, len(data)):
         timestamp = data['timestamp'].iloc[i]
@@ -34,31 +33,31 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
             stop_loss_price = entry_price - (entry_price * config.STOP_LOSS_PERCENTAGE)
             trade_size = calculate_trade_size(cumulative_pnl, entry_price, stop_loss_price)
             entry_time = timestamp
-            capital -= trade_size * entry_price  # Update capital to reflect the position
+            capital -= trade_size * entry_price
             position_status = 'Open'
         elif (data['Sell'].iloc[i] or (entry_time and timestamp - entry_time > timedelta(hours=24))) and entry_price is not None:
             exit_price = close_price
             profit_loss = trade_size * (exit_price - entry_price)
             cumulative_pnl += profit_loss
-            capital += trade_size * exit_price  # Update capital to reflect closing the position
+            capital += profit_loss
             position_status = 'Closed'
 
         if exit_price is not None:
             trade_duration = (timestamp - entry_time).total_seconds() / 3600 if entry_time else 0
             trade_results.append({
-                'Date/Time of Trade': entry_time.strftime("%m/%d/%Y %H:%M") + ' - ' + timestamp.strftime("%m/%d/%Y %H:%M") if entry_time else '',
+                'Date/Time of Trade': entry_time.strftime("%m/%d/%Y %H:%M") + ' - ' + timestamp.strftime("%m/%d/%Y %H:%M"),
                 'Trade Duration (hrs)': trade_duration,
                 'Strategy Identifier': strategy_name,
                 'Trading Pair': pair,
-                'Trade Size': trade_size if trade_size is not None else 0,
+                'Trade Size': trade_size,
+                'Risk Per Trade': config.RISK_PER_TRADE,
                 'Entry Price': entry_price,
                 'Exit Price': exit_price,
                 'Profit/Loss': profit_loss,
                 'Cumulative Profit/Loss': cumulative_pnl,
                 'Position Status': position_status
             })
-            entry_price = None  # Reset entry price for the next trade
-            trade_size = None  # Reset trade size for the next trade
+            entry_price = None
 
     return capital
 
