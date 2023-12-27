@@ -9,17 +9,15 @@ def load_data(pair):
     filename = f'{pair}_data.csv'
     return pd.read_csv(filename, parse_dates=['timestamp'])
 
-def calculate_trade_size(entry_price, stop_loss_price):
-    dollar_risk = config.INITIAL_CAPITAL * config.RISK_PER_TRADE
-    price_risk_per_unit = abs(entry_price - stop_loss_price)
-    trade_size = dollar_risk / price_risk_per_unit
-    return trade_size
+def calculate_trade_size(cumulative_profit, entry_price, stop_loss_price):
+    return (cumulative_profit * config.RISK_PER_TRADE) / (entry_price - stop_loss_price)
 
 def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
     capital = initial_capital
     cumulative_pnl = initial_capital  # Start with initial capital
     entry_price = None
     entry_time = None
+    trade_size = 0
 
     for i in range(1, len(data)):
         timestamp = data['timestamp'].iloc[i]
@@ -30,8 +28,8 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
 
         if data['Buy'].iloc[i] and capital > 0 and not entry_price:
             entry_price = close_price
-            stop_loss_price = entry_price - (entry_price * config.STOP_LOSS_PERCENTAGE)
-            trade_size = calculate_trade_size(entry_price, stop_loss_price)
+            stop_loss_price = entry_price - (initial_capital * config.STOP_LOSS_PERCENTAGE)
+            trade_size = calculate_trade_size(cumulative_pnl, entry_price, stop_loss_price)
             entry_time = timestamp
             capital = 0
             position_status = 'Open'
@@ -39,7 +37,7 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
             exit_price = close_price
             profit_loss = trade_size * (exit_price - entry_price)
             cumulative_pnl += profit_loss
-            capital += profit_loss
+            capital = trade_size * exit_price
             position_status = 'Closed'
             trade_size = 0  # Reset trade size after closing position
 
@@ -64,7 +62,7 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
 def main():
     trading_pairs = ['BTCUSDT', 'ETHUSDT', 'XRPUSDT']
     trade_results = []
-    initial_capital = config.INITIAL_CAPITAL
+    initial_capital = 10000
 
     for pair in trading_pairs:
         data = load_data(pair)
