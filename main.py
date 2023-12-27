@@ -20,6 +20,7 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
     cumulative_pnl = initial_capital  # Start with initial capital
     entry_price = None
     entry_time = None
+    trade_size = None
 
     for i in range(1, len(data)):
         timestamp = data['timestamp'].iloc[i]
@@ -41,7 +42,6 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
             cumulative_pnl += profit_loss
             capital += trade_size * exit_price  # Update capital to reflect closing the position
             position_status = 'Closed'
-            trade_size = 0  # Reset trade size after closing position
 
         if exit_price is not None:
             trade_duration = (timestamp - entry_time).total_seconds() / 3600 if entry_time else 0
@@ -50,7 +50,7 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
                 'Trade Duration (hrs)': trade_duration,
                 'Strategy Identifier': strategy_name,
                 'Trading Pair': pair,
-                'Trade Size': trade_size,
+                'Trade Size': trade_size if trade_size is not None else 0,
                 'Entry Price': entry_price,
                 'Exit Price': exit_price,
                 'Profit/Loss': profit_loss,
@@ -58,6 +58,7 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
                 'Position Status': position_status
             })
             entry_price = None  # Reset entry price for the next trade
+            trade_size = None  # Reset trade size for the next trade
 
     return capital
 
