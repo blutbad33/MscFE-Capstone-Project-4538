@@ -10,14 +10,16 @@ def load_data(pair):
     return pd.read_csv(filename, parse_dates=['timestamp'])
 
 def calculate_trade_size(cumulative_profit, entry_price, stop_loss_price):
-    return (cumulative_profit * config.RISK_PER_TRADE) / (entry_price - stop_loss_price)
+    dollar_risk = cumulative_profit * config.RISK_PER_TRADE
+    price_risk_per_unit = abs(entry_price - stop_loss_price)
+    trade_size = dollar_risk / price_risk_per_unit
+    return trade_size
 
 def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
     capital = initial_capital
     cumulative_pnl = initial_capital  # Start with initial capital
     entry_price = None
     entry_time = None
-    trade_size = 0
 
     for i in range(1, len(data)):
         timestamp = data['timestamp'].iloc[i]
@@ -28,16 +30,16 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
 
         if data['Buy'].iloc[i] and capital > 0 and not entry_price:
             entry_price = close_price
-            stop_loss_price = entry_price - (initial_capital * config.STOP_LOSS_PERCENTAGE)
+            stop_loss_price = entry_price - (entry_price * config.STOP_LOSS_PERCENTAGE)
             trade_size = calculate_trade_size(cumulative_pnl, entry_price, stop_loss_price)
             entry_time = timestamp
-            capital = 0
+            capital -= trade_size * entry_price  # Update capital to reflect the position
             position_status = 'Open'
         elif (data['Sell'].iloc[i] or (entry_time and timestamp - entry_time > timedelta(hours=24))) and entry_price is not None:
             exit_price = close_price
             profit_loss = trade_size * (exit_price - entry_price)
             cumulative_pnl += profit_loss
-            capital = trade_size * exit_price
+            capital += trade_size * exit_price  # Update capital to reflect closing the position
             position_status = 'Closed'
             trade_size = 0  # Reset trade size after closing position
 
