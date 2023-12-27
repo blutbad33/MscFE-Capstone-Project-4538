@@ -66,19 +66,22 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
 def main():
     trading_pairs = ['BTCUSDT', 'ETHUSDT', 'XRPUSDT']
     trade_results = []
-    initial_capital = 10000
+    initial_capital = config.INITIAL_CAPITAL
 
     for pair in trading_pairs:
         data = load_data(pair)
-
-        # Apply and simulate RSI and MA strategy
-        final_capital = simulate_trades(rsi_ma_strategy(data.copy()), 'RSI_MA', pair, initial_capital, trade_results)
-
-        # Apply and simulate Bollinger Bands and RSI strategy
-        final_capital = simulate_trades(bollinger_rsi_strategy(data.copy()), 'Bollinger_RSI', pair, initial_capital, trade_results)
+        simulate_trades(rsi_ma_strategy(data.copy()), 'RSI_MA', pair, initial_capital, trade_results)
+        simulate_trades(bollinger_rsi_strategy(data.copy()), 'Bollinger_RSI', pair, initial_capital, trade_results)
 
     # Save trade results to CSV
-    pd.DataFrame(trade_results).to_csv('trade_results.csv', index=False)
+    trade_results_df = pd.DataFrame(trade_results)
+    trade_results_df.to_csv('trade_results.csv', index=False)
+
+    # Organize trade results by timestamp and recalculate 'Cumulative Profit/Loss'
+    trade_results_df['Date/Time of Trade'] = pd.to_datetime(trade_results_df['Date/Time of Trade'].str.split(' - ').str[0])
+    organized_trade_results_df = trade_results_df.sort_values(by='Date/Time of Trade')
+    organized_trade_results_df['Cumulative Profit/Loss'] = organized_trade_results_df['Profit/Loss'].cumsum() + initial_capital
+    organized_trade_results_df.to_csv('trade_results_Organised.csv', index=False)
 
 if __name__ == "__main__":
     main()
