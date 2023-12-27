@@ -12,11 +12,12 @@ def load_data(pair):
 def calculate_trade_size(cumulative_profit, entry_price, stop_loss_price):
     return (cumulative_profit * config.RISK_PER_TRADE) / (entry_price - stop_loss_price) * entry_price
 
-def simulate_trades(data, strategy_name, pair, initial_capital):
+def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
     capital = initial_capital
     cumulative_pnl = initial_capital  # Start with initial capital
     entry_price = None
     entry_time = None
+    trade_size = 0
 
     for i in range(1, len(data)):
         timestamp = data['timestamp'].iloc[i]
@@ -64,12 +65,10 @@ def main():
         data = load_data(pair)
 
         # Apply and simulate RSI and MA strategy
-        strategy_data = rsi_ma_strategy(data.copy())
-        final_capital = simulate_trades(strategy_data, 'RSI_MA', pair, initial_capital)
+        final_capital = simulate_trades(rsi_ma_strategy(data.copy()), 'RSI_MA', pair, initial_capital, trade_results)
 
         # Apply and simulate Bollinger Bands and RSI strategy
-        strategy_data = bollinger_rsi_strategy(data.copy())
-        final_capital = simulate_trades(strategy_data, 'Bollinger_RSI', pair, initial_capital)
+        final_capital = simulate_trades(bollinger_rsi_strategy(data.copy()), 'Bollinger_RSI', pair, initial_capital, trade_results)
 
     # Save trade results to CSV
     pd.DataFrame(trade_results).to_csv('trade_results.csv', index=False)
