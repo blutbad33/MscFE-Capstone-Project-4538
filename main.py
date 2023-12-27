@@ -24,20 +24,22 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
         close_price = data['close'].iloc[i]
         exit_price = None
         profit_loss = 0
-        position_status = 'Closed'  # Default to 'Closed'
+        position_status = 'Open' if entry_price is not None else 'Closed'
 
-        if data['Buy'].iloc[i] and capital > 0:
+        if data['Buy'].iloc[i] and capital > 0 and not entry_price:
             stop_loss_price = cumulative_pnl - (cumulative_pnl * config.STOP_LOSS_PERCENTAGE)
             trade_size = calculate_trade_size(cumulative_pnl, close_price, stop_loss_price)
             entry_price = close_price
             entry_time = timestamp
             capital = 0
-        elif data['Sell'].iloc[i] or (entry_time and timestamp - entry_time > timedelta(hours=24)):
+            position_status = 'Open'
+        elif (data['Sell'].iloc[i] or (entry_time and timestamp - entry_time > timedelta(hours=24))) and entry_price is not None:
             exit_price = close_price
             profit_loss = trade_size * (exit_price - entry_price)
             cumulative_pnl += profit_loss
+            capital = trade_size * exit_price
             position_status = 'Closed'
-            entry_time = None  # Reset entry time for the next trade
+            entry_price = None  # Reset for the next trade
 
         if exit_price is not None:
             trade_duration = (timestamp - entry_time).total_seconds() / 3600 if entry_time else 0
@@ -55,7 +57,7 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
             })
 
     return capital
-
+    
 def main():
     trading_pairs = ['BTCUSDT', 'ETHUSDT', 'XRPUSDT']
     trade_results = []
