@@ -27,9 +27,9 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
         position_status = 'Open' if entry_price is not None else 'Closed'
 
         if data['Buy'].iloc[i] and capital > 0 and not entry_price:
-            stop_loss_price = cumulative_pnl - (cumulative_pnl * config.STOP_LOSS_PERCENTAGE)
-            trade_size = calculate_trade_size(cumulative_pnl, close_price, stop_loss_price)
             entry_price = close_price
+            stop_loss_price = entry_price - (initial_capital * config.STOP_LOSS_PERCENTAGE)
+            trade_size = calculate_trade_size(cumulative_pnl, entry_price, stop_loss_price)
             entry_time = timestamp
             capital = 0
             position_status = 'Open'
@@ -39,12 +39,12 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
             cumulative_pnl += profit_loss
             capital = trade_size * exit_price
             position_status = 'Closed'
-            entry_price = None  # Reset for the next trade
+            trade_size = 0  # Reset trade size after closing position
 
         if exit_price is not None:
             trade_duration = (timestamp - entry_time).total_seconds() / 3600 if entry_time else 0
             trade_results.append({
-                'Date/Time of Trade': entry_time.strftime("%d/%m/%Y %H:%M") + ' - ' + timestamp.strftime("%d/%m/%Y %H:%M") if entry_time else '',
+                'Date/Time of Trade': entry_time.strftime("%m/%d/%Y %H:%M") + ' - ' + timestamp.strftime("%m/%d/%Y %H:%M") if entry_time else '',
                 'Trade Duration (hrs)': trade_duration,
                 'Strategy Identifier': strategy_name,
                 'Trading Pair': pair,
@@ -55,6 +55,7 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
                 'Cumulative Profit/Loss': cumulative_pnl,
                 'Position Status': position_status
             })
+            entry_price = None  # Reset entry price for the next trade
 
     return capital
     
