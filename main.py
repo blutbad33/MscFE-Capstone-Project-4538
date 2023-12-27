@@ -31,28 +31,29 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
 
         if data['Buy'].iloc[i] and capital > 0 and not entry_price:
             entry_price = close_price
-            stop_loss_price = entry_price - (initial_capital * config.STOP_LOSS_PERCENTAGE)
+            stop_loss_price = entry_price - (entry_price * config.STOP_LOSS_PERCENTAGE)
             trade_size, risk_per_trade = calculate_trade_size(cumulative_pnl, entry_price, stop_loss_price)
             entry_time = timestamp
             capital -= trade_size * entry_price
 
         if (data['Sell'].iloc[i] or (entry_time and timestamp - entry_time >= timedelta(hours=24))) and entry_price is not None:
             exit_price = close_price
-            profit_loss = trade_size * (exit_price - entry_price) if trade_size is not None else 0
+            profit_loss = trade_size * (exit_price - entry_price)
             cumulative_pnl += profit_loss
-            capital += trade_size * exit_price if trade_size is not None else 0
+            capital += profit_loss
+            exit_time = timestamp
 
-        if exit_price is not None or (entry_time and timestamp - entry_time >= timedelta(hours=24)):
-            trade_duration = (timestamp - entry_time).total_seconds() / 3600 if entry_time else 0
+        if exit_price is not None:
+            trade_duration = (exit_time - entry_time).total_seconds() / 3600 if entry_time else 0
             trade_results.append({
-                'Date/Time of Trade': entry_time.strftime("%m/%d/%Y %H:%M") + ' - ' + timestamp.strftime("%m/%d/%Y %H:%M"),
+                'Date/Time of Trade': entry_time.strftime("%m/%d/%Y %H:%M") + ' - ' + exit_time.strftime("%m/%d/%Y %H:%M"),
                 'Trade Duration (hrs)': trade_duration,
                 'Strategy Identifier': strategy_name,
                 'Trading Pair': pair,
-                'Trade Size': trade_size if trade_size is not None else 0,
-                'Risk Per Trade': risk_per_trade if risk_per_trade is not None else 0,
-                'Entry Price': entry_price,
-                'Exit Price': exit_price if exit_price is not None else 0,
+                'Trade Size': trade_size or 0,
+                'Risk Per Trade': risk_per_trade or 0,
+                'Entry Price': entry_price or 0,
+                'Exit Price': exit_price or 0,
                 'Profit/Loss': profit_loss,
                 'Cumulative Profit/Loss': cumulative_pnl,
                 'Position Status': 'Closed'
