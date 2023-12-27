@@ -29,7 +29,6 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
         exit_price = None
         profit_loss = 0
 
-        # Buy condition
         if data['Buy'].iloc[i] and capital > 0 and not entry_price:
             entry_price = close_price
             stop_loss_price = entry_price - (initial_capital * config.STOP_LOSS_PERCENTAGE)
@@ -37,25 +36,22 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
             entry_time = timestamp
             capital -= trade_size * entry_price
 
-        # Sell condition or auto-sell after 24 hours
         if (data['Sell'].iloc[i] or (entry_time and timestamp - entry_time >= timedelta(hours=24))) and entry_price is not None:
             exit_price = close_price
             profit_loss = trade_size * (exit_price - entry_price) if trade_size is not None else 0
             cumulative_pnl += profit_loss
             capital += trade_size * exit_price if trade_size is not None else 0
-            entry_price = None
 
-        # Append trade result
-        if exit_price is not None:
+        if exit_price is not None or (entry_time and timestamp - entry_time >= timedelta(hours=24)):
             trade_duration = (timestamp - entry_time).total_seconds() / 3600 if entry_time else 0
             trade_results.append({
-                'Date/Time of Trade': entry_time.strftime("%Y-%m-%d %H:%M") + ' - ' + timestamp.strftime("%Y-%m-%d %H:%M"),
+                'Date/Time of Trade': entry_time.strftime("%m/%d/%Y %H:%M") + ' - ' + timestamp.strftime("%m/%d/%Y %H:%M"),
                 'Trade Duration (hrs)': trade_duration,
                 'Strategy Identifier': strategy_name,
                 'Trading Pair': pair,
                 'Trade Size': trade_size if trade_size is not None else 0,
                 'Risk Per Trade': risk_per_trade if risk_per_trade is not None else 0,
-                'Entry Price': entry_price if entry_price is not None else 0,
+                'Entry Price': entry_price,
                 'Exit Price': exit_price if exit_price is not None else 0,
                 'Profit/Loss': profit_loss,
                 'Cumulative Profit/Loss': cumulative_pnl,
