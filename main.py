@@ -43,10 +43,11 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
             capital += profit_loss
             exit_time = timestamp
 
-        if exit_price is not None:
-            trade_duration = (exit_time - entry_time).total_seconds() / 3600 if entry_time else 0
+            trade_duration = (exit_time - entry_time).total_seconds() / 3600
+            formatted_entry_time = entry_time.strftime("%m/%d/%Y %H:%M")
+            formatted_exit_time = exit_time.strftime("%m/%d/%Y %H:%M")
             trade_results.append({
-                'Date/Time of Trade': entry_time.strftime("%m/%d/%Y %H:%M") + ' - ' + exit_time.strftime("%m/%d/%Y %H:%M"),
+                'Date/Time of Trade': f'{formatted_entry_time} - {formatted_exit_time}',
                 'Trade Duration (hrs)': trade_duration,
                 'Strategy Identifier': strategy_name,
                 'Trading Pair': pair,
