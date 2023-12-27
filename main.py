@@ -13,7 +13,7 @@ def calculate_trade_size(cumulative_profit, entry_price, stop_loss_price):
     dollar_risk = cumulative_profit * config.RISK_PER_TRADE
     price_risk_per_unit = abs(entry_price - stop_loss_price)
     trade_size = dollar_risk / price_risk_per_unit
-    return trade_size  # Only returning trade_size
+    return trade_size
 
 def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
     capital = initial_capital
@@ -26,7 +26,6 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
         close_price = data['close'].iloc[i]
         exit_price = None
         profit_loss = 0
-        position_status = 'Open' if entry_price is not None else 'Closed'
 
         if data['Buy'].iloc[i] and capital > 0 and not entry_price:
             entry_price = close_price
@@ -34,13 +33,11 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
             trade_size = calculate_trade_size(cumulative_pnl, entry_price, stop_loss_price)
             entry_time = timestamp
             capital -= trade_size * entry_price
-            position_status = 'Open'
         elif (data['Sell'].iloc[i] or (entry_time and timestamp - entry_time > timedelta(hours=24))) and entry_price is not None:
             exit_price = close_price
             profit_loss = trade_size * (exit_price - entry_price)
             cumulative_pnl += profit_loss
             capital += profit_loss
-            position_status = 'Closed'
 
         if exit_price is not None:
             trade_duration = (timestamp - entry_time).total_seconds() / 3600 if entry_time else 0
@@ -55,7 +52,7 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
                 'Exit Price': exit_price,
                 'Profit/Loss': profit_loss,
                 'Cumulative Profit/Loss': cumulative_pnl,
-                'Position Status': position_status
+                'Position Status': 'Closed'
             })
             entry_price = None
 
@@ -75,10 +72,9 @@ def main():
         # Apply and simulate Bollinger Bands and RSI strategy
         simulate_trades(bollinger_rsi_strategy(data.copy()), 'Bollinger_RSI', pair, initial_capital, trade_results)
 
-    # Save trade results to CSV and sort by trade date and time
+    # Save trade results to CSV and sort by trading pair
     trade_results_df = pd.DataFrame(trade_results)
-    trade_results_df['Date/Time of Trade'] = pd.to_datetime(trade_results_df['Date/Time of Trade'].str.split(' - ').str[0])
-    trade_results_df.sort_values(by='Date/Time of Trade', inplace=True)
+    trade_results_df.sort_values(by='Trading Pair', inplace=True)
     trade_results_df.to_csv('trade_results.csv', index=False)
 
 if __name__ == "__main__":
