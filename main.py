@@ -7,7 +7,7 @@ import config
 # Load Crypto Pairs
 def load_data(pair):
     filename = f'{pair}_data.csv'
-    return pd.read_csv(filename, parse_dates=['timestamp'], date_parser=lambda x: pd.to_datetime(x, format='%m/%d/%y %H:%M'))
+    return pd.read_csv(filename, parse_dates=['timestamp'], date_parser=lambda x: pd.to_datetime(x, format='%Y-%m-%d %H:%M:%S'))
 
 def calculate_trade_size(cumulative_profit, entry_price, stop_loss_price):
     dollar_risk = cumulative_profit * config.RISK_PER_TRADE
