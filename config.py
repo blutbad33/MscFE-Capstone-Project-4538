@@ -10,8 +10,8 @@ TRADE_INTERVAL = '1h'  # Trading interval
 
 # Technical analysis settings for RSI and Moving Average Strategy
 RSI_PERIOD = 10  # Period for Relative Strength Index
-OVERBOUGHT_RSI = 60
-OVERSOLD_RSI = 30
+OVERBOUGHT_RSI = 80
+OVERSOLD_RSI = 20
 SHORT_TERM_MA_PERIOD = 5  # Period for short-term EMA
 LONG_TERM_MA_PERIOD = 10  # Period for long-term EMA
 
