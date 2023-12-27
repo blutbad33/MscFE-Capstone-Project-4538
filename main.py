@@ -20,7 +20,6 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
     cumulative_pnl = initial_capital  # Start with initial capital
     entry_price = None
     entry_time = None
-    trade_size = None
 
     for i in range(1, len(data)):
         timestamp = data['timestamp'].iloc[i]
@@ -45,12 +44,14 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
 
         if exit_price is not None:
             trade_duration = (timestamp - entry_time).total_seconds() / 3600 if entry_time else 0
+            risk_per_trade = config.RISK_PER_TRADE
             trade_results.append({
                 'Date/Time of Trade': entry_time.strftime("%m/%d/%Y %H:%M") + ' - ' + timestamp.strftime("%m/%d/%Y %H:%M") if entry_time else '',
                 'Trade Duration (hrs)': trade_duration,
                 'Strategy Identifier': strategy_name,
                 'Trading Pair': pair,
                 'Trade Size': trade_size if trade_size is not None else 0,
+                'Risk Per Trade': risk_per_trade,
                 'Entry Price': entry_price,
                 'Exit Price': exit_price,
                 'Profit/Loss': profit_loss,
