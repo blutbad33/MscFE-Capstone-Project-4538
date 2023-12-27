@@ -13,52 +13,59 @@ def calculate_trade_size(cumulative_profit, entry_price, stop_loss_price):
     dollar_risk = cumulative_profit * config.RISK_PER_TRADE
     price_risk_per_unit = abs(entry_price - stop_loss_price)
     trade_size = dollar_risk / price_risk_per_unit
-    return trade_size
+    return trade_size, config.RISK_PER_TRADE
 
 def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
     capital = initial_capital
-    cumulative_pnl = initial_capital  # Start with initial capital
+    cumulative_pnl = initial_capital
     entry_price = None
     entry_time = None
     trade_size = None
+    risk_per_trade = None
 
     for i in range(1, len(data)):
         timestamp = data['timestamp'].iloc[i]
         close_price = data['close'].iloc[i]
         exit_price = None
         profit_loss = 0
-        position_status = 'Open' if entry_price is not None else 'Closed'
 
         if data['Buy'].iloc[i] and capital > 0 and not entry_price:
             entry_price = close_price
-            stop_loss_price = entry_price - (entry_price * config.STOP_LOSS_PERCENTAGE)
-            trade_size = calculate_trade_size(cumulative_pnl, entry_price, stop_loss_price)
+            stop_loss_price = entry_price - (initial_capital * config.STOP_LOSS_PERCENTAGE)
+            trade_size, risk_per_trade = calculate_trade_size(cumulative_pnl, entry_price, stop_loss_price)
             entry_time = timestamp
-            capital -= trade_size * entry_price  # Update capital to reflect the position
-            position_status = 'Open'
-        elif (data['Sell'].iloc[i] or (entry_time and timestamp - entry_time > timedelta(hours=24))) and entry_price is not None:
+            capital -= trade_size * entry_price
+        elif entry_time and (timestamp - entry_time >= timedelta(hours=24)):
             exit_price = close_price
             profit_loss = trade_size * (exit_price - entry_price)
             cumulative_pnl += profit_loss
-            capital += trade_size * exit_price  # Update capital to reflect closing the position
-            position_status = 'Closed'
+            capital += trade_size * exit_price
+            entry_price = None
+
+        if data['Sell'].iloc[i] and entry_price is not None:
+            exit_price = close_price
+            profit_loss = trade_size * (exit_price - entry_price)
+            cumulative_pnl += profit_loss
+            capital += trade_size * exit_price
+            entry_price = None
 
         if exit_price is not None:
             trade_duration = (timestamp - entry_time).total_seconds() / 3600 if entry_time else 0
             trade_results.append({
-                'Date/Time of Trade': entry_time.strftime("%m/%d/%Y %H:%M") + ' - ' + timestamp.strftime("%m/%d/%Y %H:%M") if entry_time else '',
+                'Date/Time of Trade': entry_time.strftime("%Y-%m-%d %H:%M") + ' - ' + timestamp.strftime("%Y-%m-%d %H:%M"),
                 'Trade Duration (hrs)': trade_duration,
                 'Strategy Identifier': strategy_name,
                 'Trading Pair': pair,
-                'Trade Size': trade_size if trade_size is not None else 0,
+                'Trade Size': trade_size,
+                'Risk Per Trade': risk_per_trade,
                 'Entry Price': entry_price,
                 'Exit Price': exit_price,
                 'Profit/Loss': profit_loss,
                 'Cumulative Profit/Loss': cumulative_pnl,
-                'Position Status': position_status
+                'Position Status': 'Closed'
             })
-            entry_price = None  # Reset entry price for the next trade
-            trade_size = None  # Reset trade size for the next trade
+            trade_size = None
+            risk_per_trade = None
 
     return capital
 
@@ -71,13 +78,16 @@ def main():
         data = load_data(pair)
 
         # Apply and simulate RSI and MA strategy
-        final_capital = simulate_trades(rsi_ma_strategy(data.copy()), 'RSI_MA', pair, initial_capital, trade_results)
+        simulate_trades(rsi_ma_strategy(data.copy()), 'RSI_MA', pair, initial_capital, trade_results)
 
         # Apply and simulate Bollinger Bands and RSI strategy
-        final_capital = simulate_trades(bollinger_rsi_strategy(data.copy()), 'Bollinger_RSI', pair, initial_capital, trade_results)
+        simulate_trades(bollinger_rsi_strategy(data.copy()), 'Bollinger_RSI', pair, initial_capital, trade_results)
 
-    # Save trade results to CSV
-    pd.DataFrame(trade_results).to_csv('trade_results.csv', index=False)
+    # Save trade results to CSV and sort by trade date and time
+    trade_results_df = pd.DataFrame(trade_results)
+    trade_results_df['Date/Time of Trade'] = pd.to_datetime(trade_results_df['Date/Time of Trade'].str.split(' - ').str[0])
+    trade_results_df.sort_values(by='Date/Time of Trade', inplace=True)
+    trade_results_df.to_csv('trade_results.csv', index=False)
 
 if __name__ == "__main__":
     main()
