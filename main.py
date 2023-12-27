@@ -55,6 +55,8 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
                 'Position Status': 'Closed'
             })
             entry_price = None
+            trade_size = None  # Reset trade size for the next trade
+            risk_per_trade = None  # Reset for the next trade
 
     return capital
 
