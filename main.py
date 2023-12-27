@@ -64,7 +64,7 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
 def main():
     trading_pairs = ['BTCUSDT', 'ETHUSDT', 'XRPUSDT']
     trade_results = []
-    initial_capital = 10000
+    initial_capital = config.INITIAL_CAPITAL
 
     for pair in trading_pairs:
         data = load_data(pair)
