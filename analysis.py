@@ -8,9 +8,6 @@ df = pd.read_csv('trade_results_Organised.csv')
 daily_returns_df = pd.read_csv('daily_returns.csv')
 daily_returns_df['Day/Date'] = pd.to_datetime(daily_returns_df['Day/Date'])
 
-# Print the column names to verify
-print(daily_returns_df.columns)  # This line prints the column names
-
 # Function to convert string of returns to a list of floats
 def convert_to_floats(return_string):
     try:
@@ -127,7 +124,7 @@ for strategy in strategies + [' Combined ']:
 risk_ruin_monte_carlo_df.to_csv('risk_ruin_monte_carlo_analysis.csv')
 
 # Plotting graphs for each strategy and combined strategy
-for strategy in strategies + [' Combined ']:
+for strategy in strategies + ['Combined']:
     strategy_data = df[df['Strategy Identifier'] == strategy.strip()]
     
     # Account balance growth
@@ -135,7 +132,13 @@ for strategy in strategies + [' Combined ']:
     strategy_data['Cumulative Profit/Loss'].plot(title=f'Account Balance Growth - {strategy}')
     plt.xlabel('Date')
     plt.ylabel('Balance')
-    plt.xticks(ticks=pd.date_range(start='2018', periods=6, freq='Y').year)
+    # Customizing the x-axis ticks
+    plt.gca().xaxis.set_major_locator(mdates.AutoDateLocator())  # Automatic tick placement
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # Formatting the date
+    
+    plt.xticks(rotation=45)  # Rotate the ticks for better readability
+    plt.legend()
+    plt.tight_layout()
     plt.savefig(f'account_balance_growth_{strategy}.png')
     plt.close()
 
@@ -147,9 +150,13 @@ for strategy in strategies + [' Combined ']:
     plt.xlabel('Date')
     plt.ylabel('Drawdown %')
     plt.ylim(-20, 35)  # Set y-axis limits
-    plt.xticks(ticks=pd.date_range(start='2018', periods=6, freq='Y').year)
+    # Customizing the x-axis ticks
+    plt.gca().xaxis.set_major_locator(mdates.AutoDateLocator())  # Automatic tick placement
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # Formatting the date
+    
+    plt.xticks(rotation=45)  # Rotate the ticks for better readability
+    plt.legend()
+    plt.tight_layout()
     plt.savefig(f'drawdown_{strategy}.png')
     plt.close()
 
-if __name__ == "__main__":
-    main()
