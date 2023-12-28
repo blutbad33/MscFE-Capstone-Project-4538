@@ -6,9 +6,11 @@ from scipy.stats import zscore
 # Load trade results
 df = pd.read_csv('trade_results_Organised.csv')
 df['Date/Time of Trade'] = pd.to_datetime(df['Date/Time of Trade'].str.split(' - ').str[0])
+daily_returns_df = pd.read_csv('daily_returns.csv')
+daily_returns_df['Day/Date'] = pd.to_datetime(daily_returns_df['Day/Date'])
 
 # Function to calculate various metrics
-def analyze_trades(data):
+def analyze_trades(data, daily_returns):
     num_trades = len(data)
     num_profit_trades = len(data[data['Profit/Loss'] > 0])
     num_loss_trades = len(data[data['Profit/Loss'] < 0])
@@ -20,10 +22,10 @@ def analyze_trades(data):
     profit_trade_margin = num_profit_trades / num_trades * 100 if num_trades > 0 else 0
     loss_trade_margin = num_loss_trades / num_trades * 100 if num_trades > 0 else 0
 
-    daily_returns = data['Profit/Loss'].pct_change().dropna()
-    mean_return = np.mean(daily_returns)
-    sharpe_ratio = (mean_return - 0.01) / np.std(daily_returns) * np.sqrt(252) if np.std(daily_returns) != 0 else None
-    std_deviation = np.std(daily_returns)
+    # Calculating mean return, Sharpe ratio, and standard deviation from daily returns
+    mean_return = daily_returns.mean()
+    std_deviation = daily_returns.std()
+    sharpe_ratio = mean_return / std_deviation * np.sqrt(252) if std_deviation != 0 else None
 
     return {
         'Number of Trades': num_trades,
@@ -63,17 +65,19 @@ def monte_carlo_simulation(data, num_simulations=1000):
 
     return {"Monte Carlo Mean Ending Balance": np.mean(simulation_results)}
 
-# Analyze strategies
+# Analyze strategies using daily returns
 strategy_metrics = {}
 strategies = df['Strategy Identifier'].unique()
 for strategy in strategies:
     strategy_data = df[df['Strategy Identifier'] == strategy]
-    metrics = analyze_trades(strategy_data)
+    strategy_daily_returns = daily_returns_df[strategy].dropna()
+    metrics = analyze_trades(strategy_data, strategy_daily_returns)
     strategy_metrics[strategy] = metrics
 
 # Analyze combined performance
 combined_data = df.copy()
-combined_metrics = analyze_trades(combined_data)
+combined_daily_returns = daily_returns_df['Combined'].dropna()
+combined_metrics = analyze_trades(combined_data, combined_daily_returns)
 strategy_metrics['Combined'] = combined_metrics
 
 # Save metrics to CSV
@@ -98,7 +102,7 @@ for strategy in strategies.tolist() + ['Combined']:
     strategy_data['Cumulative Profit/Loss'].plot(title=f'Account Balance Growth - {strategy}')
     plt.xlabel('Date')
     plt.ylabel('Balance')
-    plt.xticks(ticks=pd.date_range(start=strategy_data['Date/Time of Trade'].min(), end=strategy_data['Date/Time of Trade'].max(), freq='Y').year)
+    plt.xticks(ticks=pd.date_range(start='2018', periods=6, freq='Y').year)
     plt.savefig(f'account_balance_growth_{strategy}.png')
     plt.close()
 
@@ -110,6 +114,9 @@ for strategy in strategies.tolist() + ['Combined']:
     plt.xlabel('Date')
     plt.ylabel('Drawdown %')
     plt.ylim(-20, 35)  # Set y-axis limits
-    plt.xticks(ticks=pd.date_range(start=strategy_data['Date/Time of Trade'].min(), end=strategy_data['Date/Time of Trade'].max(), freq='Y').year)
+    plt.xticks(ticks=pd.date_range(start='2018', periods=6, freq='Y').year)
     plt.savefig(f'drawdown_{strategy}.png')
     plt.close()
+
+if __name__ == "__main__":
+    main()
