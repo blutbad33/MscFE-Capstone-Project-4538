@@ -60,22 +60,31 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
 
 # Function to calculate daily returns
 def calculate_daily_returns(trade_results_df):
-    trade_results_df['Date'] = trade_results_df['Date/Time of Trade'].dt.date
-    strategies = trade_results_df['Strategy Identifier'].unique()
-    daily_returns = pd.DataFrame()
+    try:
+        print("Calculating daily returns...")
+        # Ensure 'Date/Time of Trade' is datetime type
+        if not pd.api.types.is_datetime64_any_dtype(trade_results_df['Date/Time of Trade']):
+            trade_results_df['Date/Time of Trade'] = pd.to_datetime(trade_results_df['Date/Time of Trade'], format='%m/%d/%Y %H:%M')
 
-    for strategy in strategies:
-        strategy_data = trade_results_df[trade_results_df['Strategy Identifier'] == strategy]
-        strategy_daily = strategy_data.groupby('Date')['Profit/Loss'].sum()
-        daily_returns[strategy] = strategy_daily
+        trade_results_df['Date'] = trade_results_df['Date/Time of Trade'].dt.date
+        strategies = trade_results_df['Strategy Identifier'].unique()
+        daily_returns = pd.DataFrame()
 
-    combined_daily = trade_results_df.groupby('Date')['Profit/Loss'].sum()
-    daily_returns['Combined'] = combined_daily
+        for strategy in strategies:
+            strategy_data = trade_results_df[trade_results_df['Strategy Identifier'] == strategy]
+            strategy_daily = strategy_data.groupby('Date')['Profit/Loss'].sum()
+            daily_returns[strategy] = strategy_daily
 
-    daily_returns_pct = daily_returns.pct_change() * 100
-    daily_returns_pct.reset_index(inplace=True)
-    daily_returns_pct.rename(columns={'Date': 'Day/Date'}, inplace=True)
-    return daily_returns_pct
+        combined_daily = trade_results_df.groupby('Date')['Profit/Loss'].sum()
+        daily_returns['Combined'] = combined_daily
+
+        daily_returns_pct = daily_returns.pct_change() * 100
+        daily_returns_pct.reset_index(inplace=True)
+        daily_returns_pct.rename(columns={'Date': 'Day/Date'}, inplace=True)
+        return daily_returns_pct
+    except Exception as e:
+        print(f"Error in calculate_daily_returns: {e}")
+        return pd.DataFrame()
 
 # Main function to run the trading simulation
 def main():
