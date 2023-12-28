@@ -62,11 +62,10 @@ def simulate_trades(data, strategy_name, pair, initial_capital, trade_results):
 def calculate_daily_returns(trade_results_df):
     try:
         print("Calculating daily returns...")
-        # Ensure 'Date/Time of Trade' is datetime type
-        if not pd.api.types.is_datetime64_any_dtype(trade_results_df['Date/Time of Trade']):
-            trade_results_df['Date/Time of Trade'] = pd.to_datetime(trade_results_df['Date/Time of Trade'], format='%m/%d/%Y %H:%M')
+        # Split the 'Date/Time of Trade' column and convert the start time to datetime
+        trade_results_df['Start Time'] = pd.to_datetime(trade_results_df['Date/Time of Trade'].str.split(' - ').str[0], format='%m/%d/%Y %H:%M')
 
-        trade_results_df['Date'] = trade_results_df['Date/Time of Trade'].dt.date
+        trade_results_df['Date'] = trade_results_df['Start Time'].dt.date
         strategies = trade_results_df['Strategy Identifier'].unique()
         daily_returns = pd.DataFrame()
 
