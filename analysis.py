@@ -6,6 +6,8 @@ from scipy.stats import zscore
 # Load trade results
 df = pd.read_csv('trade_results_Organised.csv')
 df['Date/Time of Trade'] = pd.to_datetime(df['Date/Time of Trade'])
+initial_capital = 10000  # Assuming initial capital is 10,000
+risk_free_return = 0.01  # 1% risk-free return
 
 # Function to calculate various metrics
 def analyze_trades(data):
@@ -14,21 +16,28 @@ def analyze_trades(data):
     num_loss_trades = len(data[data['Profit/Loss'] < 0])
     gross_profit = data[data['Profit/Loss'] > 0]['Profit/Loss'].sum()
     gross_loss = data[data['Profit/Loss'] < 0]['Profit/Loss'].sum()
-    max_consecutive_wins = (data['Profit/Loss'] > 0).astype(int).groupby(data['Profit/Loss'].le(0).cumsum()).cumsum().max()
-    max_consecutive_profit = data['Profit/Loss'].groupby(data['Profit/Loss'].le(0).cumsum()).cumsum().max()
+    account_balance = data['Cumulative Profit/Loss'].iloc[-1] + initial_capital
+    roi = (account_balance - initial_capital) / initial_capital * 100
+
+    profit_trade_margin = num_profit_trades / num_trades * 100 if num_trades > 0 else 0
+    loss_trade_margin = num_loss_trades / num_trades * 100 if num_trades > 0 else 0
 
     daily_returns = data['Profit/Loss'].pct_change().dropna()
-    sharpe_ratio = np.mean(daily_returns) / np.std(daily_returns) * np.sqrt(252)
+    mean_return = np.mean(daily_returns)
+    sharpe_ratio = (mean_return - risk_free_return) / np.std(daily_returns) * np.sqrt(252)
     std_deviation = np.std(daily_returns)
 
     return {
         'Number of Trades': num_trades,
         'Number of Profit Trades': num_profit_trades,
         'Number of Loss Trades': num_loss_trades,
+        'Profit Trade Margin (%)': profit_trade_margin,
+        'Loss Trade Margin (%)': loss_trade_margin,
         'Gross Profit': gross_profit,
         'Gross Loss': gross_loss,
-        'Max Consecutive Wins': max_consecutive_wins,
-        'Max Consecutive Profit': max_consecutive_profit,
+        'Account Balance': account_balance,
+        'ROI (%)': roi,
+        'Mean Return': mean_return,
         'Sharpe Ratio': sharpe_ratio,
         'Standard Deviation': std_deviation
     }
@@ -57,8 +66,9 @@ for strategy in strategies.tolist() + ['Combined']:
     # Account balance growth
     plt.figure(figsize=(10, 6))
     strategy_data['Cumulative Profit/Loss'].plot(title=f'Account Balance Growth - {strategy}')
-    plt.xlabel('Date')
+    plt.xlabel('Years')
     plt.ylabel('Balance')
+    plt.xticks(ticks=np.arange(strategy_data['Date/Time of Trade'].min().year, strategy_data['Date/Time of Trade'].max().year + 1, 1))
     plt.savefig(f'account_balance_growth_{strategy}.png')
     plt.close()
 
@@ -67,7 +77,9 @@ for strategy in strategies.tolist() + ['Combined']:
     drawdown_pct = drawdown / strategy_data['Cumulative Profit/Loss'].cummax() * 100
     plt.figure(figsize=(10, 6))
     drawdown_pct.plot(title=f'Drawdown in % - {strategy}')
-    plt.xlabel('Date')
+    plt.xlabel('Years')
     plt.ylabel('Drawdown %')
+    plt.ylim(-20, 35)  # Set y-axis limits
+    plt.xticks(ticks=np.arange(strategy_data['Date/Time of Trade'].min().year, strategy_data['Date/Time of Trade'].max().year + 1, 1))
     plt.savefig(f'drawdown_{strategy}.png')
     plt.close()
