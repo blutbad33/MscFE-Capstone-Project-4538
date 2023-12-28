@@ -109,17 +109,17 @@ for strategy in strategies:
 
 # Analyze combined performance
 combined_data = df.copy()
-combined_daily_returns = daily_returns_df['Combined'].dropna()
+combined_daily_returns = daily_returns_df[' Combined '].dropna()
 combined_metrics = analyze_trades(combined_data, combined_daily_returns)
-strategy_metrics['Combined'] = combined_metrics
+strategy_metrics[' Combined '] = combined_metrics
 
 # Save metrics to CSV
 analysis_df = pd.DataFrame(strategy_metrics)
 analysis_df.to_csv('analysis.csv')
 
 # Risk of Ruin and Monte Carlo Analysis
-risk_ruin_monte_carlo_df = pd.DataFrame(index=strategies.tolist() + ['Combined'])
-for strategy in strategies.tolist() + ['Combined']:
+risk_ruin_monte_carlo_df = pd.DataFrame(index=strategies.tolist() + [' Combined '])
+for strategy in strategies.tolist() + [' Combined ']:
     strategy_data = combined_data if strategy == 'Combined' else df[df['Strategy Identifier'] == strategy]
     risk_ruin_monte_carlo_df.loc[strategy, 'Risk of Ruin'] = risk_of_ruin(strategy_data)["Risk of Ruin"]
     risk_ruin_monte_carlo_df.loc[strategy, 'Monte Carlo Mean Ending Balance'] = monte_carlo_simulation(strategy_data)["Monte Carlo Mean Ending Balance"]
