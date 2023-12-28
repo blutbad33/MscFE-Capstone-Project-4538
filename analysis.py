@@ -8,6 +8,9 @@ df = pd.read_csv('trade_results_Organised.csv')
 daily_returns_df = pd.read_csv('daily_returns.csv')
 daily_returns_df['Day/Date'] = pd.to_datetime(daily_returns_df['Day/Date'])
 
+# Print the column names to verify
+print(daily_returns_df.columns)  # This line prints the column names
+
 # Function to calculate various metrics
 def analyze_trades(data, daily_returns):
     num_trades = len(data)
