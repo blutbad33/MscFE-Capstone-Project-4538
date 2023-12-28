@@ -119,7 +119,7 @@ analysis_df.to_csv('analysis.csv')
 
 # Risk of Ruin and Monte Carlo Analysis
 risk_ruin_monte_carlo_df = pd.DataFrame(index=strategies + [' Combined '])
-for strategy in strategies.tolist() + [' Combined ']:
+for strategy in strategies + [' Combined ']:
     strategy_data = combined_data if strategy == ' Combined ' else df[df['Strategy Identifier'] == strategy]
     risk_ruin_monte_carlo_df.loc[strategy, 'Risk of Ruin'] = risk_of_ruin(strategy_data)["Risk of Ruin"]
     risk_ruin_monte_carlo_df.loc[strategy, 'Monte Carlo Mean Ending Balance'] = monte_carlo_simulation(strategy_data)["Monte Carlo Mean Ending Balance"]
