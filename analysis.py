@@ -11,6 +11,22 @@ daily_returns_df['Day/Date'] = pd.to_datetime(daily_returns_df['Day/Date'])
 # Print the column names to verify
 print(daily_returns_df.columns)  # This line prints the column names
 
+# Function to convert string of returns to a list of floats
+def convert_to_floats(return_string):
+    try:
+        return [float(item) for item in return_string.split()]
+    except ValueError:
+        return np.nan
+
+# Load and process daily returns
+daily_returns_df = pd.read_csv('daily_returns.csv')
+daily_returns_df['Day/Date'] = pd.to_datetime(daily_returns_df['Day/Date'])
+
+# Convert return data to numeric format
+for column in daily_returns_df.columns:
+    if column != 'Day/Date':
+        daily_returns_df[column] = daily_returns_df[column].apply(convert_to_floats)
+
 # Function to calculate various metrics
 def analyze_trades(data, daily_returns):
     num_trades = len(data)
