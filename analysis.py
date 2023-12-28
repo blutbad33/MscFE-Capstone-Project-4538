@@ -29,6 +29,21 @@ for column in daily_returns_df.columns:
 
 # Function to calculate various metrics
 def analyze_trades(data, daily_returns):
+    if data.empty:
+        return {
+            'Number of Trades': 0,
+            'Number of Profit Trades': 0,
+            'Number of Loss Trades': 0,
+            'Profit Trade Margin (%)': 0,
+            'Loss Trade Margin (%)': 0,
+            'Gross Profit': 0,
+            'Gross Loss': 0,
+            'Account Balance': 10000,  # Initial capital
+            'ROI (%)': 0,
+            'Mean Return': 0,
+            'Sharpe Ratio': 0,
+            'Standard Deviation': 0
+        }
     num_trades = len(data)
     num_profit_trades = len(data[data['Profit/Loss'] > 0])
     num_loss_trades = len(data[data['Profit/Loss'] < 0])
