@@ -83,5 +83,27 @@ def main():
     organized_trade_results_df['Cumulative Profit/Loss'] = organized_trade_results_df['Profit/Loss'].cumsum() + initial_capital
     organized_trade_results_df.to_csv('trade_results_Organised.csv', index=False)
 
+def calculate_daily_returns(trade_results_df):
+    trade_results_df['Date'] = trade_results_df['Date/Time of Trade'].dt.date
+    strategies = trade_results_df['Strategy Identifier'].unique()
+    daily_returns = pd.DataFrame()
+
+    for strategy in strategies:
+        strategy_data = trade_results_df[trade_results_df['Strategy Identifier'] == strategy]
+        strategy_daily = strategy_data.groupby('Date')['Profit/Loss'].sum()
+        daily_returns[strategy] = strategy_daily
+
+    combined_daily = trade_results_df.groupby('Date')['Profit/Loss'].sum()
+    daily_returns['Combined'] = combined_daily
+
+    # Calculate returns as percentage change
+    daily_returns_pct = daily_returns.pct_change() * 100
+    daily_returns_pct.reset_index(inplace=True)
+    daily_returns_pct.rename(columns={'Date': 'Day/Date'}, inplace=True)
+    return daily_returns_pct
+
 if __name__ == "__main__":
+     # Calculate and save daily returns
+    daily_returns_df = calculate_daily_returns(organized_trade_results_df)
+    daily_returns_df.to_csv('daily_returns.csv', index=False)
     main()
