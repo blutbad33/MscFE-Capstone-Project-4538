@@ -5,7 +5,6 @@ from scipy.stats import zscore
 
 # Load trade results
 df = pd.read_csv('trade_results_Organised.csv')
-df['Date/Time of Trade'] = pd.to_datetime(df['Date/Time of Trade'].str.split(' - ').str[0])
 daily_returns_df = pd.read_csv('daily_returns.csv')
 daily_returns_df['Day/Date'] = pd.to_datetime(daily_returns_df['Day/Date'])
 
@@ -67,11 +66,10 @@ def monte_carlo_simulation(data, num_simulations=1000):
 
 # Analyze strategies using daily returns
 strategy_metrics = {}
-strategies = ['RSI_MA', 'Bollinger_RSI', 'Combined']  # Explicitly specifying strategy names
+strategies = ['RSI_MA', 'Bollinger_RSI', 'Combined']
 for strategy in strategies:
-    strategy_data = df[df['Strategy Identifier'] == strategy] if strategy != 'Combined' else df
     strategy_daily_returns = daily_returns_df[strategy].dropna()
-    metrics = analyze_trades(strategy_data, strategy_daily_returns)
+    metrics = analyze_trades(strategy_daily_returns)
     strategy_metrics[strategy] = metrics
 
 # Analyze combined performance
