@@ -25,7 +25,7 @@ daily_returns_df['Day/Date'] = pd.to_datetime(daily_returns_df['Day/Date'])
 # Convert return data to numeric format
 for column in daily_returns_df.columns:
     if column != 'Day/Date':
-        daily_returns_df[column] = daily_returns_df[column].apply(convert_to_floats)
+        daily_returns_df[column] = pd.to_numeric(daily_returns_df[column], errors='coerce')
 
 # Function to calculate various metrics
 def analyze_trades(data, daily_returns):
