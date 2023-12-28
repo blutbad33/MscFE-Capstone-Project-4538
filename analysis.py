@@ -127,8 +127,8 @@ for strategy in strategies.tolist() + ['Combined']:
 risk_ruin_monte_carlo_df.to_csv('risk_ruin_monte_carlo_analysis.csv')
 
 # Plotting graphs for each strategy and combined strategy
-for strategy in strategies.tolist() + ['Combined']:
-    strategy_data = combined_data if strategy == 'Combined' else df[df['Strategy Identifier'] == strategy]
+for strategy in strategies.tolist() + [' Combined ']:
+    strategy_data = combined_data if strategy == ' Combined ' else df[df['Strategy Identifier'] == strategy]
     
     # Account balance growth
     plt.figure(figsize=(10, 6))
