@@ -3,12 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import zscore
 
-# Here's where you load trade results
-df = pd.read_csv('trade_results.csv')
+# Load trade results
+df = pd.read_csv('trade_results_Organised.csv')
 df['Date/Time of Trade'] = pd.to_datetime(df['Date/Time of Trade'])
-df['Week'] = df['Date/Time of Trade'].dt.isocalendar().week
 
-# These are the functions to calculate various metrics needed
+# Function to calculate various metrics
 def analyze_trades(data):
     num_trades = len(data)
     num_profit_trades = len(data[data['Profit/Loss'] > 0])
@@ -17,18 +16,11 @@ def analyze_trades(data):
     gross_loss = data[data['Profit/Loss'] < 0]['Profit/Loss'].sum()
     max_consecutive_wins = (data['Profit/Loss'] > 0).astype(int).groupby(data['Profit/Loss'].le(0).cumsum()).cumsum().max()
     max_consecutive_profit = data['Profit/Loss'].groupby(data['Profit/Loss'].le(0).cumsum()).cumsum().max()
-    num_trades_per_week = data.groupby('Week').size().mean()
-    num_long_trades = len(data[data['Trade Type'] == 'Buy'])
-    num_short_trades = len(data[data['Trade Type'] == 'Sell'])
-    drawdown = (data['Cumulative Profit/Loss'].cummax() - data['Cumulative Profit/Loss']).max()
 
-    # Here we calculate additional metrics like Sharpe ratio, Time weighted Return, Standard deviation, Z-score
-    daily_returns = data['Profit/Loss'].pct_change()
-    sharpe_ratio = daily_returns.mean() / daily_returns.std() * np.sqrt(252)
-    time_weighted_return = np.prod(1 + daily_returns) - 1
-    std_deviation = daily_returns.std()
-    z_score = zscore(daily_returns)[-1]
-    
+    daily_returns = data['Profit/Loss'].pct_change().dropna()
+    sharpe_ratio = np.mean(daily_returns) / np.std(daily_returns) * np.sqrt(252)
+    std_deviation = np.std(daily_returns)
+
     return {
         'Number of Trades': num_trades,
         'Number of Profit Trades': num_profit_trades,
@@ -38,36 +30,44 @@ def analyze_trades(data):
         'Max Consecutive Wins': max_consecutive_wins,
         'Max Consecutive Profit': max_consecutive_profit,
         'Sharpe Ratio': sharpe_ratio,
-        'Time Weighted Return': time_weighted_return,
-        'Standard Deviation': std_deviation,
-        'Z-score': z_score,
-        'Number of Trades per Week': num_trades_per_week,
-        'Number of Long Trades': num_long_trades,
-        'Number of Short Trades': num_short_trades,
-        'Drawdown %': drawdown / (drawdown + data['Cumulative Profit/Loss'].max()) * 100
+        'Standard Deviation': std_deviation
     }
 
-# Analysis for each strategy
-for strategy in df['Strategy Identifier'].unique():
+# Compare strategies
+strategy_metrics = {}
+strategies = df['Strategy Identifier'].unique()
+for strategy in strategies:
     strategy_data = df[df['Strategy Identifier'] == strategy]
     metrics = analyze_trades(strategy_data)
-    print(f"Metrics for {strategy}:")
-    for metric, value in metrics.items():
-        print(f"{metric}: {value}")
+    strategy_metrics[strategy] = metrics
 
-    # Plotting Graphs
+# Analyze combined performance
+combined_data = df.copy()
+combined_metrics = analyze_trades(combined_data)
+strategy_metrics['Combined'] = combined_metrics
+
+# Save metrics to CSV
+analysis_df = pd.DataFrame(strategy_metrics)
+analysis_df.to_csv('analysis.csv')
+
+# Plotting graphs for each strategy and combined strategy
+for strategy in strategies.tolist() + ['Combined']:
+    strategy_data = combined_data if strategy == 'Combined' else df[df['Strategy Identifier'] == strategy]
+    
     # Account balance growth
     plt.figure(figsize=(10, 6))
     strategy_data['Cumulative Profit/Loss'].plot(title=f'Account Balance Growth - {strategy}')
     plt.xlabel('Date')
     plt.ylabel('Balance')
-    plt.show()
+    plt.savefig(f'account_balance_growth_{strategy}.png')
+    plt.close()
 
     # Drawdown in %
     drawdown = (strategy_data['Cumulative Profit/Loss'].cummax() - strategy_data['Cumulative Profit/Loss'])
-    drawdown_pct = drawdown / (drawdown + strategy_data['Cumulative Profit/Loss'].max()) * 100
+    drawdown_pct = drawdown / strategy_data['Cumulative Profit/Loss'].cummax() * 100
     plt.figure(figsize=(10, 6))
     drawdown_pct.plot(title=f'Drawdown in % - {strategy}')
     plt.xlabel('Date')
     plt.ylabel('Drawdown %')
-    plt.show()
+    plt.savefig(f'drawdown_{strategy}.png')
+    plt.close()
