@@ -69,11 +69,12 @@ def monte_carlo_simulation(data, num_simulations=1000):
 
 # Analyze strategies using daily returns
 strategy_metrics = {}
-strategies = ['RSI_MA', 'Bollinger_RSI', 'Combined']
+strategies = [' RSI_MA ', ' Bollinger_RSI ', ' Combined ']
 for strategy in strategies:
+    strategy_data = df[df['Strategy Identifier'] == strategy.strip()]
     strategy_daily_returns = daily_returns_df[strategy].dropna()
-    metrics = analyze_trades(strategy_daily_returns)
-    strategy_metrics[strategy] = metrics
+    metrics = analyze_trades(strategy_data, strategy_daily_returns)
+    strategy_metrics[strategy.strip()] = metrics
 
 # Analyze combined performance
 combined_data = df.copy()
