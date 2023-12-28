@@ -77,7 +77,7 @@ def calculate_daily_returns(trade_results_df):
         combined_daily = trade_results_df.groupby('Date')['Profit/Loss'].sum()
         daily_returns['Combined'] = combined_daily
 
-        daily_returns_pct = daily_returns.pct_change() * 100
+        daily_returns_pct = daily_returns.pct_change() 
         daily_returns_pct.reset_index(inplace=True)
         daily_returns_pct.rename(columns={'Date': 'Day/Date'}, inplace=True)
         return daily_returns_pct
