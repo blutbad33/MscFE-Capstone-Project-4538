@@ -67,9 +67,9 @@ def monte_carlo_simulation(data, num_simulations=1000):
 
 # Analyze strategies using daily returns
 strategy_metrics = {}
-strategies = df['Strategy Identifier'].unique()
+strategies = ['RSI_MA', 'Bollinger_RSI', 'Combined']  # Explicitly specifying strategy names
 for strategy in strategies:
-    strategy_data = df[df['Strategy Identifier'] == strategy]
+    strategy_data = df[df['Strategy Identifier'] == strategy] if strategy != 'Combined' else df
     strategy_daily_returns = daily_returns_df[strategy].dropna()
     metrics = analyze_trades(strategy_data, strategy_daily_returns)
     strategy_metrics[strategy] = metrics
