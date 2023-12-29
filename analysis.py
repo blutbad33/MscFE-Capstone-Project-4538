@@ -124,9 +124,14 @@ analysis_df = pd.DataFrame(strategy_metrics, index=index_list)
 analysis_df.to_csv('analysis.csv')
 
 # Risk of Ruin and Monte Carlo Analysis
-risk_ruin_monte_carlo_df = pd.DataFrame(index=strategies + [' Combined '])
+risk_ruin_monte_carlo_df = pd.DataFrame(index=strategies + ['Combined'])
 for strategy in strategies + [' Combined ']:
-    strategy_data = combined_data if strategy == ' Combined ' else df[df['Strategy Identifier'] == strategy]
+    if strategy == ' Combined ':
+        strategy_data = combined_data
+    elif strategy == 'RSI_MA':
+        strategy_data = df[df['Strategy Identifier'] == 'RSI_MA']
+    elif strategy == 'Bollinger_RSI':
+        strategy_data = df[df['Strategy Identifier'] == 'Bollinger_RSI']
 
     # Debug: Print the data for strategy
     print(f"Strategy: {strategy}")
