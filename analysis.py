@@ -124,18 +124,14 @@ for strategy in strategies + [' Combined ']:
 
 risk_ruin_monte_carlo_df.to_csv('risk_ruin_monte_carlo_analysis.csv')
 
-print("Strategy:", strategy)
-print("Number of rows in strategy_data:", len(strategy_data))
-print(strategy_data.head())
-
 # Plotting graphs for each strategy and combined strategy
 for strategy in strategies + [' Combined ']:
     if strategy == ' Combined ':
         strategy_data = combined_data
-    elif strategy == ' RSI_MA ':
-        strategy_data = df[df['Strategy Identifier'] == ' RSI_MA ']
-    elif strategy == ' Bollinger_RSI ':
-        strategy_data = df[df['Strategy Identifier'] == ' Bollinger_RSI ']
+    elif strategy == 'RSI_MA':
+        strategy_data = df[df['Strategy Identifier'] == 'RSI_MA']
+    elif strategy == 'Bollinger_RSI':
+        strategy_data = df[df['Strategy Identifier'] == 'Bollinger_RSI']
     
     # Account balance growth
     plt.figure(figsize=(10, 6))
