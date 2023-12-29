@@ -150,32 +150,36 @@ for strategy in strategies + [' Combined ']:
 
 risk_ruin_monte_carlo_df.to_csv('risk_ruin_monte_carlo_analysis.csv')
 
-# Plotting graphs for each strategy and combined strategy
-for strategy in strategies + [' Combined ']:
-    if strategy == ' Combined ':
-        strategy_data = combined_data
-    elif strategy == 'RSI_MA':
-        strategy_data = df[df['Strategy Identifier'] == 'RSI_MA']
-    elif strategy == 'Bollinger_RSI':
-        strategy_data = df[df['Strategy Identifier'] == 'Bollinger_RSI']
+# Defining the function to plot graphs for each strategy
+def plot_strategy_graphs(strategy_name, strategy_data):
     
-    # Account balance growth
+    # Plot Account Balance Growth
     plt.figure(figsize=(10, 6))
-    strategy_data['Cumulative Profit/Loss'].plot(title=f'Account Balance Growth - {strategy}')
+    strategy_data['Cumulative Profit/Loss'].plot(title=f'Account Balance Growth - {strategy_name}')
     plt.xlabel('Date')
     plt.xticks([])
     plt.ylabel('Balance')
-    plt.savefig(f'account_balance_growth_{strategy}.png')
+    plt.savefig(f'account_balance_growth_{strategy_name}.png')
     plt.close()
 
-    # Drawdown in %
+    # Plot Drawdown in %
     drawdown = (strategy_data['Cumulative Profit/Loss'].cummax() - strategy_data['Cumulative Profit/Loss'])
     drawdown_pct = drawdown / strategy_data['Cumulative Profit/Loss'].cummax() * 100
     plt.figure(figsize=(10, 6))
-    drawdown_pct.plot(title=f'Drawdown in % - {strategy}')
+    drawdown_pct.plot(title=f'Drawdown in % - {strategy_name}')
     plt.xlabel('Date')
     plt.xticks([])
     plt.ylabel('Drawdown %')
     plt.ylim(-20, 35)  # Set y-axis limits
-    plt.savefig(f'drawdown_{strategy}.png')
+    plt.savefig(f'drawdown_{strategy_name}.png')
     plt.close()
+
+# Define the data for each strategy
+rsi_ma_data = df[df['Strategy Identifier'] == 'RSI_MA']
+bollinger_rsi_data = df[df['Strategy Identifier'] == 'Bollinger_RSI']
+combined_data = pd.concat([rsi_ma_data, bollinger_rsi_data])
+
+# Plot graphs for each strategy
+plot_strategy_graphs('Combined', combined_data)
+plot_strategy_graphs('RSI_MA', rsi_ma_data)
+plot_strategy_graphs('Bollinger_RSI', bollinger_rsi_data)
