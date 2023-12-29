@@ -150,36 +150,38 @@ for strategy in strategies + [' Combined ']:
 
 risk_ruin_monte_carlo_df.to_csv('risk_ruin_monte_carlo_analysis.csv')
 
-# Defining the function to plot graphs for each strategy
-def plot_strategy_graphs(strategy_name, strategy_data):
-    
-    # Plot Account Balance Growth
-    plt.figure(figsize=(10, 6))
-    strategy_data['Cumulative Profit/Loss'].plot(title=f'Account Balance Growth - {strategy_name}')
-    plt.xlabel('Date')
-    plt.xticks([])
-    plt.ylabel('Balance')
-    plt.savefig(f'account_balance_growth_{strategy_name}.png')
-    plt.close()
-
-    # Plot Drawdown in %
-    drawdown = (strategy_data['Cumulative Profit/Loss'].cummax() - strategy_data['Cumulative Profit/Loss'])
-    drawdown_pct = drawdown / strategy_data['Cumulative Profit/Loss'].cummax() * 100
-    plt.figure(figsize=(10, 6))
-    drawdown_pct.plot(title=f'Drawdown in % - {strategy_name}')
-    plt.xlabel('Date')
-    plt.xticks([])
-    plt.ylabel('Drawdown %')
-    plt.ylim(-20, 35)  # Set y-axis limits
-    plt.savefig(f'drawdown_{strategy_name}.png')
-    plt.close()
-
 # Define the data for each strategy
 rsi_ma_data = df[df['Strategy Identifier'] == 'RSI_MA']
 bollinger_rsi_data = df[df['Strategy Identifier'] == 'Bollinger_RSI']
 combined_data = pd.concat([rsi_ma_data, bollinger_rsi_data])
 
-# Plot graphs for each strategy
-plot_strategy_graphs('Combined', combined_data)
-plot_strategy_graphs('RSI_MA', rsi_ma_data)
-plot_strategy_graphs('Bollinger_RSI', bollinger_rsi_data)
+# Function to calculate drawdown in %
+def calculate_drawdown(data):
+    drawdown = (data['Cumulative Profit/Loss'].cummax() - data['Cumulative Profit/Loss'])
+    drawdown_pct = drawdown / data['Cumulative Profit/Loss'].cummax() * 100
+    return drawdown_pct
+
+# Plot Account Balance Growth for each strategy
+plt.figure(figsize=(10, 6))
+plt.plot(combined_data['Cumulative Profit/Loss'], label='Combined', color='blue')
+plt.plot(rsi_ma_data['Cumulative Profit/Loss'], label='RSI_MA', color='green')
+plt.plot(bollinger_rsi_data['Cumulative Profit/Loss'], label='Bollinger_RSI', color='red')
+plt.title('Account Balance Growth')
+plt.xlabel('Date')
+plt.ylabel('Balance')
+plt.legend()
+plt.savefig('account_balance_growth.png')
+plt.close()
+
+# Plot Drawdown in % for each strategy
+plt.figure(figsize=(10, 6))
+plt.plot(calculate_drawdown(combined_data), label='Combined', color='blue')
+plt.plot(calculate_drawdown(rsi_ma_data), label='RSI_MA', color='green')
+plt.plot(calculate_drawdown(bollinger_rsi_data), label='Bollinger_RSI', color='red')
+plt.title('Drawdown in %')
+plt.xlabel('Date')
+plt.ylabel('Drawdown %')
+plt.legend()
+plt.ylim(-20, 35)  # Set y-axis limits if necessary
+plt.savefig('drawdown.png')
+plt.close()
