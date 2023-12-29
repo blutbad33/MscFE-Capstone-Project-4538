@@ -132,7 +132,7 @@ for strategy in strategies + [' Combined ']:
     plt.figure(figsize=(10, 6))
     strategy_data['Cumulative Profit/Loss'].plot(title=f'Account Balance Growth - {strategy}')
     plt.xlabel('Date')
-    plt.xticks().remove()
+    plt.xticks([])
     plt.ylabel('Balance')
     plt.savefig(f'account_balance_growth_{strategy}.png')
     plt.close()
@@ -143,7 +143,7 @@ for strategy in strategies + [' Combined ']:
     plt.figure(figsize=(10, 6))
     drawdown_pct.plot(title=f'Drawdown in % - {strategy}')
     plt.xlabel('Date')
-    plt.xticks().remove()
+    plt.xticks([])
     plt.ylabel('Drawdown %')
     plt.ylim(-20, 35)  # Set y-axis limits
     plt.savefig(f'drawdown_{strategy}.png')
