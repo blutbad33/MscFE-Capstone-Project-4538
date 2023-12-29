@@ -126,7 +126,6 @@ risk_ruin_monte_carlo_df.to_csv('risk_ruin_monte_carlo_analysis.csv')
 
 # Plotting graphs for each strategy and combined strategy
 for strategy in strategies + [' Combined ']:
-    for strategy in strategies + [' Combined ']:
     if strategy == ' Combined ':
         strategy_data = combined_data
     elif strategy == ' RSI_MA ':
