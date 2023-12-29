@@ -113,7 +113,6 @@ index_list = ['Number of Trades', 'Number of Profit Trades', 'Number of Loss Tra
 analysis_df = pd.DataFrame(strategy_metrics, index=index_list)
 
 # Save metrics to CSV
-analysis_df = pd.DataFrame(strategy_metrics)
 analysis_df.to_csv('analysis.csv')
 
 # Risk of Ruin and Monte Carlo Analysis
