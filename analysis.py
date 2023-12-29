@@ -53,21 +53,6 @@ def analyze_trades(data, daily_returns):
     profit_trade_margin = num_profit_trades / num_trades * 100 if num_trades > 0 else 0
     loss_trade_margin = num_loss_trades / num_trades * 100 if num_trades > 0 else 0
 
-# Function for Monte Carlo Simulation
-def monte_carlo_simulation(data, num_simulations=1000):
-    mean_return = data['Profit/Loss'].pct_change().mean()
-    std_deviation = data['Profit/Loss'].pct_change().std()
-    initial_balance = 10000
-    simulation_results = []
-
-    for _ in range(num_simulations):
-        simulated_balance = initial_balance
-        for _ in range(len(data)):
-            simulated_balance *= (1 + np.random.normal(mean_return, std_deviation))
-        simulation_results.append(simulated_balance)
-
-    return {"Monte Carlo Mean Ending Balance": np.mean(simulation_results)}
-    
     # Calculating mean return, Sharpe ratio, and standard deviation from daily returns
     mean_return = daily_returns.mean()
     std_deviation = daily_returns.std()
@@ -87,6 +72,29 @@ def monte_carlo_simulation(data, num_simulations=1000):
         'Sharpe Ratio': sharpe_ratio,
         'Standard Deviation': std_deviation
     }
+
+# Function for Monte Carlo Simulation
+def monte_carlo_simulation(data, num_simulations=1000):
+    mean_return = data['Profit/Loss'].pct_change().mean()
+    std_deviation = data['Profit/Loss'].pct_change().std()
+    initial_balance = 10000
+    simulation_results = []
+
+    for _ in range(num_simulations):
+        simulated_balance = initial_balance
+        for _ in range(len(data)):
+            simulated_balance *= (1 + np.random.normal(mean_return, std_deviation))
+        simulation_results.append(simulated_balance)
+
+    return {"Monte Carlo Mean Ending Balance": np.mean(simulation_results)}
+
+# Function for Risk of Ruin Analysis
+def risk_of_ruin(data):
+    losing_trades = data[data['Profit/Loss'] < 0]
+    win_rate = 1 - len(losing_trades) / len(data) if len(data) > 0 else 0
+    average_loss = losing_trades['Profit/Loss'].mean() if not losing_trades.empty else 0
+    risk_of_ruin = np.power(average_loss / data['Cumulative Profit/Loss'].max(), len(data)) if average_loss < 0 else 0
+    return {"Risk of Ruin": risk_of_ruin}
 
 # Analyze strategies using daily returns
 strategy_metrics = {}
@@ -153,4 +161,3 @@ for strategy in strategies + [' Combined ']:
     plt.ylim(-20, 35)  # Set y-axis limits
     plt.savefig(f'drawdown_{strategy}.png')
     plt.close()
-
