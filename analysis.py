@@ -103,6 +103,15 @@ combined_daily_returns = daily_returns_df[' Combined '].dropna()
 combined_metrics = analyze_trades(combined_data, combined_daily_returns)
 strategy_metrics['Combined'] = combined_metrics
 
+# After calculating strategy_metrics, create an index list
+index_list = ['Number of Trades', 'Number of Profit Trades', 'Number of Loss Trades', 
+              'Profit Trade Margin (%)', 'Loss Trade Margin (%)', 'Gross Profit', 
+              'Gross Loss', 'Account Balance', 'ROI (%)', 'Mean Return', 
+              'Sharpe Ratio', 'Standard Deviation']
+
+# Create a DataFrame using strategy_metrics and the custom index
+analysis_df = pd.DataFrame(strategy_metrics, index=index_list)
+
 # Save metrics to CSV
 analysis_df = pd.DataFrame(strategy_metrics)
 analysis_df.to_csv('analysis.csv')
