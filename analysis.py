@@ -127,6 +127,19 @@ analysis_df.to_csv('analysis.csv')
 risk_ruin_monte_carlo_df = pd.DataFrame(index=strategies + [' Combined '])
 for strategy in strategies + [' Combined ']:
     strategy_data = combined_data if strategy == ' Combined ' else df[df['Strategy Identifier'] == strategy]
+
+    # Debug: Print the data for strategy
+    print(f"Strategy: {strategy}")
+    print(strategy_data.head())  # Print the first few rows of data
+
+    # Calculate Risk of Ruin and Monte Carlo Mean Ending Balance
+    risk_of_ruin_result = risk_of_ruin(strategy_data)
+    monte_carlo_result = monte_carlo_simulation(strategy_data)
+    
+    # Debug: Print intermediate results
+    print(f"Risk of Ruin Result: {risk_of_ruin_result}")
+    print(f"Monte Carlo Result: {monte_carlo_result}")
+    
     risk_ruin_monte_carlo_df.loc[strategy, 'Risk of Ruin'] = risk_of_ruin(strategy_data)["Risk of Ruin"]
     risk_ruin_monte_carlo_df.loc[strategy, 'Monte Carlo Mean Ending Balance'] = monte_carlo_simulation(strategy_data)["Monte Carlo Mean Ending Balance"]
 
