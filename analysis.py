@@ -129,11 +129,13 @@ for strategy in strategies + ['Combined']:
     strategy_data = combined_data if strategy == 'Combined' else df[df['Strategy Identifier'] == strategy]
     
     # Account balance growth
+    print(strategy_data.head())  # Print the first few rows of strategy_data for debugging
     plt.figure(figsize=(10, 6))
     strategy_data['Cumulative Profit/Loss'].plot(title=f'Account Balance Growth - {strategy}')
     plt.xlabel('Date')
     plt.ylabel('Balance')
     # Customizing the x-axis ticks
+    print("Date range:", pd.Timestamp('2018-01-01'), pd.Timestamp('2023-11-30'))  # Debugging
     plt.xlim(pd.Timestamp('2018-01-01'), pd.Timestamp('2023-11-30'))
     plt.gca().xaxis.set_major_locator(mdates.AutoDateLocator())  # Automatic tick placement
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # Formatting the date
@@ -153,7 +155,7 @@ for strategy in strategies + ['Combined']:
     plt.ylim(-20, 35)  # Set y-axis limits
     
     # Customizing the x-axis ticks
-    plt.xlim(pd.Timestamp('2018-01-01'), pd.Timestamp('2023-11-30'))
+     plt.xlim(pd.Timestamp('2018-01-01'), pd.Timestamp('2023-11-30'))
     plt.gca().xaxis.set_major_locator(mdates.AutoDateLocator())  # Automatic tick placement
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # Formatting the date
     plt.xticks(rotation=45)  # Rotate the ticks for better readability
