@@ -53,6 +53,21 @@ def analyze_trades(data, daily_returns):
     profit_trade_margin = num_profit_trades / num_trades * 100 if num_trades > 0 else 0
     loss_trade_margin = num_loss_trades / num_trades * 100 if num_trades > 0 else 0
 
+# Function for Monte Carlo Simulation
+def monte_carlo_simulation(data, num_simulations=1000):
+    mean_return = data['Profit/Loss'].pct_change().mean()
+    std_deviation = data['Profit/Loss'].pct_change().std()
+    initial_balance = 10000
+    simulation_results = []
+
+    for _ in range(num_simulations):
+        simulated_balance = initial_balance
+        for _ in range(len(data)):
+            simulated_balance *= (1 + np.random.normal(mean_return, std_deviation))
+        simulation_results.append(simulated_balance)
+
+    return {"Monte Carlo Mean Ending Balance": np.mean(simulation_results)}
+    
     # Calculating mean return, Sharpe ratio, and standard deviation from daily returns
     mean_return = daily_returns.mean()
     std_deviation = daily_returns.std()
@@ -81,20 +96,14 @@ def risk_of_ruin(data):
     risk_of_ruin = np.power(average_loss / data['Cumulative Profit/Loss'].max(), len(data)) if average_loss < 0 else 0
     return {"Risk of Ruin": risk_of_ruin}
 
-# Function for Monte Carlo Simulation
-def monte_carlo_simulation(data, num_simulations=1000):
-    mean_return = data['Profit/Loss'].pct_change().mean()
-    std_deviation = data['Profit/Loss'].pct_change().std()
-    initial_balance = 10000
-    simulation_results = []
+# Risk of Ruin and Monte Carlo Analysis
+risk_ruin_monte_carlo_df = pd.DataFrame(index=strategies + [' Combined '])
+for strategy in strategies + [' Combined ']:
+    strategy_data = combined_data if strategy == ' Combined ' else df[df['Strategy Identifier'] == strategy]
+    risk_ruin_monte_carlo_df.loc[strategy, 'Risk of Ruin'] = risk_of_ruin(strategy_data)["Risk of Ruin"]
+    risk_ruin_monte_carlo_df.loc[strategy, 'Monte Carlo Mean Ending Balance'] = monte_carlo_simulation(strategy_data)["Monte Carlo Mean Ending Balance"]
 
-    for _ in range(num_simulations):
-        simulated_balance = initial_balance
-        for _ in range(len(data)):
-            simulated_balance *= (1 + np.random.normal(mean_return, std_deviation))
-        simulation_results.append(simulated_balance)
-
-    return {"Monte Carlo Mean Ending Balance": np.mean(simulation_results)}
+risk_ruin_monte_carlo_df.to_csv('risk_of_ruin_monte_carlo.csv')  # Save results to CSV
 
 # Analyze strategies using daily returns
 strategy_metrics = {}
