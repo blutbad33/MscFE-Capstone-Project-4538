@@ -88,23 +88,6 @@ def monte_carlo_simulation(data, num_simulations=1000):
         'Standard Deviation': std_deviation
     }
 
-# Function for Risk of Ruin Analysis
-def risk_of_ruin(data):
-    losing_trades = data[data['Profit/Loss'] < 0]
-    win_rate = 1 - len(losing_trades) / len(data) if len(data) > 0 else 0
-    average_loss = losing_trades['Profit/Loss'].mean() if not losing_trades.empty else 0
-    risk_of_ruin = np.power(average_loss / data['Cumulative Profit/Loss'].max(), len(data)) if average_loss < 0 else 0
-    return {"Risk of Ruin": risk_of_ruin}
-
-# Risk of Ruin and Monte Carlo Analysis
-risk_ruin_monte_carlo_df = pd.DataFrame(index=strategies + [' Combined '])
-for strategy in strategies + [' Combined ']:
-    strategy_data = combined_data if strategy == ' Combined ' else df[df['Strategy Identifier'] == strategy]
-    risk_ruin_monte_carlo_df.loc[strategy, 'Risk of Ruin'] = risk_of_ruin(strategy_data)["Risk of Ruin"]
-    risk_ruin_monte_carlo_df.loc[strategy, 'Monte Carlo Mean Ending Balance'] = monte_carlo_simulation(strategy_data)["Monte Carlo Mean Ending Balance"]
-
-risk_ruin_monte_carlo_df.to_csv('risk_of_ruin_monte_carlo.csv')  # Save results to CSV
-
 # Analyze strategies using daily returns
 strategy_metrics = {}
 strategies = [' RSI_MA ', ' Bollinger_RSI ', ' Combined ']
