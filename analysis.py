@@ -125,13 +125,14 @@ for strategy in strategies + [' Combined ']:
 risk_ruin_monte_carlo_df.to_csv('risk_ruin_monte_carlo_analysis.csv')
 
 # Plotting graphs for each strategy and combined strategy
-for strategy in strategies + ['Combined']:
-    strategy_data = combined_data if strategy == 'Combined' else df[df['Strategy Identifier'] == strategy]
+for strategy in strategies + [' Combined ']:
+    strategy_data = combined_data if strategy == ' Combined ' else df[df['Strategy Identifier'] == strategy]
     
     # Account balance growth
     plt.figure(figsize=(10, 6))
     strategy_data['Cumulative Profit/Loss'].plot(title=f'Account Balance Growth - {strategy}')
     plt.xlabel('Date')
+    plt.xticks().remove()
     plt.ylabel('Balance')
     plt.savefig(f'account_balance_growth_{strategy}.png')
     plt.close()
@@ -142,6 +143,7 @@ for strategy in strategies + ['Combined']:
     plt.figure(figsize=(10, 6))
     drawdown_pct.plot(title=f'Drawdown in % - {strategy}')
     plt.xlabel('Date')
+    plt.xticks().remove()
     plt.ylabel('Drawdown %')
     plt.ylim(-20, 35)  # Set y-axis limits
     plt.savefig(f'drawdown_{strategy}.png')
