@@ -124,6 +124,10 @@ for strategy in strategies + [' Combined ']:
 
 risk_ruin_monte_carlo_df.to_csv('risk_ruin_monte_carlo_analysis.csv')
 
+print("Strategy:", strategy)
+print("Number of rows in strategy_data:", len(strategy_data))
+print(strategy_data.head())
+
 # Plotting graphs for each strategy and combined strategy
 for strategy in strategies + [' Combined ']:
     if strategy == ' Combined ':
