@@ -129,9 +129,9 @@ for strategy in strategies + [' Combined ']:
     if strategy == ' Combined ':
         strategy_data = combined_data
     elif strategy == 'RSI_MA':
-        strategy_data = df[df['Strategy Identifier'] == 'RSI_MA']
+        strategy_data = df[df['Strategy Identifier'] == ' RSI_MA ']
     elif strategy == 'Bollinger_RSI':
-        strategy_data = df[df['Strategy Identifier'] == 'Bollinger_RSI']
+        strategy_data = df[df['Strategy Identifier'] == ' Bollinger_RSI ']
 
     # Debug: Print the data for strategy
     print(f"Strategy: {strategy}")
