@@ -155,7 +155,7 @@ for strategy in strategies + ['Combined']:
     plt.ylim(-20, 35)  # Set y-axis limits
     
     # Customizing the x-axis ticks
-     plt.xlim(pd.Timestamp('2018-01-01'), pd.Timestamp('2023-11-30'))
+    plt.xlim(pd.Timestamp('2018-01-01'), pd.Timestamp('2023-11-30'))
     plt.gca().xaxis.set_major_locator(mdates.AutoDateLocator())  # Automatic tick placement
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # Formatting the date
     plt.xticks(rotation=45)  # Rotate the ticks for better readability
