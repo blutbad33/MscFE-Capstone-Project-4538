@@ -124,7 +124,7 @@ analysis_df = pd.DataFrame(strategy_metrics, index=index_list)
 analysis_df.to_csv('analysis.csv')
 
 # Risk of Ruin and Monte Carlo Analysis
-risk_ruin_monte_carlo_df = pd.DataFrame(index=strategies + ['Combined'])
+risk_ruin_monte_carlo_df = pd.DataFrame(index=strategies + [' Combined '])
 for strategy in strategies + [' Combined ']:
     if strategy == ' Combined ':
         strategy_data = combined_data
