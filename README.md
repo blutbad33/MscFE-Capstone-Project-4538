@@ -53,8 +53,12 @@ This project requires the following modules:
 Clone the repository and install the required Python packages:
 
 ```bash
+Strictly use Anaconda due to the TA-Libs
 git clone https://github.com/blutbad33/MscFE-Capstone-Project-4538.git
 cd cryptocurrency-trading-model
+conda create --name myenv
+conda activate myenv
+conda install -c conda-forge ta-lib
 pip install -r requirements.txt
 python fetch_historical_data.py
 python main.py
