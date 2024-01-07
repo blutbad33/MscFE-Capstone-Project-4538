@@ -75,6 +75,9 @@ def analyze_trades(data, daily_returns):
 
 # Function for Monte Carlo Simulation
 def monte_carlo_simulation(data, num_simulations=1000):
+    if data.empty:
+        return {"Monte Carlo Mean Ending Balance": 0}
+
     mean_return = data['Profit/Loss'].pct_change().mean()
     std_deviation = data['Profit/Loss'].pct_change().std()
     initial_balance = 10000
