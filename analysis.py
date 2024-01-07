@@ -98,7 +98,7 @@ def risk_of_ruin(data):
 
 # Analyze strategies using daily returns
 strategy_metrics = {}
-strategies = [' RSI_MA ', ' Bollinger_RSI ', ' Combined ']
+strategies = ['RSI_MA', 'Bollinger_RSI', 'Combined']
 for strategy in strategies:
     strategy_data = df[df['Strategy Identifier'] == strategy.strip()]
     strategy_daily_returns = daily_returns_df[strategy].dropna()
