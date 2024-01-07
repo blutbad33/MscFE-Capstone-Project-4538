@@ -107,7 +107,7 @@ for strategy in strategies:
 
 # Analyze combined performance
 combined_data = df.copy()
-combined_daily_returns = daily_returns_df[' Combined '].dropna()
+combined_daily_returns = daily_returns_df['Combined'].dropna()
 combined_metrics = analyze_trades(combined_data, combined_daily_returns)
 strategy_metrics['Combined'] = combined_metrics
 
