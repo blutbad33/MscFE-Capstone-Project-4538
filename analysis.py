@@ -7,7 +7,7 @@ from scipy.stats import zscore
 # Load trade results
 df = pd.read_csv('trade_results_Organised.csv')
 daily_returns_df = pd.read_csv('daily_returns.csv')
-daily_returns_df['Day/Date'] = pd.to_datetime(daily_returns_df['Day/Date'])
+daily_returns_df['Day/Date'] = pd.to_datetime(daily_returns_df['Day/Date'], format = '%d/%m/%Y')
 
 # Function to convert string of returns to a list of floats
 def convert_to_floats(return_string):
