@@ -153,14 +153,20 @@ for strategy in strategies + [' Combined ']:
 
 risk_ruin_monte_carlo_df.to_csv('risk_ruin_monte_carlo_analysis.csv')
 
-
+# Function to calculate combined account balance
+def calculate_combined_balance(rsi_ma_df, bollinger_rsi_df):
+    combined_df = rsi_ma_df[['Cumulative Profit/Loss']].copy()
+    combined_df['Bollinger_RSI Cumulative'] = bollinger_rsi_df['Cumulative Profit/Loss']
+    combined_df['Combined Cumulative'] = combined_df.sum(axis=1)
+    return combined_df
+    
 #Plotting
 df['Start Time'] = pd.to_datetime(df['Date/Time of Trade'].str.split(' - ').str[0], format='%m/%d/%Y %H:%M')
 
 # Define the data for each strategy
 rsi_ma_data = df[df['Strategy Identifier'] == 'RSI_MA'].set_index('Start Time')
 bollinger_rsi_data = df[df['Strategy Identifier'] == 'Bollinger_RSI'].set_index('Start Time')
-combined_data = pd.concat([rsi_ma_data, bollinger_rsi_data])
+combined_data = calculate_combined_balance(rsi_ma_data, bollinger_rsi_data)
 
 # Function to calculate drawdown in %
 def calculate_drawdown(data):
