@@ -157,6 +157,9 @@ risk_ruin_monte_carlo_df.to_csv('risk_ruin_monte_carlo_analysis.csv')
 df['Start Time'] = pd.to_datetime(df['Date/Time of Trade'].str.split(' - ').str[0], format='%m/%d/%Y %H:%M')
 df.set_index('Start Time', inplace=True)
 
+# Ensure unique indices by taking the last entry of each day
+df = df.groupby(df.index).last()
+
 # Define the data for each strategy
 rsi_ma_data = df[df['Strategy Identifier'] == 'RSI_MA'].resample('D').ffill()
 bollinger_rsi_data = df[df['Strategy Identifier'] == 'Bollinger_RSI'].resample('D').ffill()
