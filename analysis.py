@@ -153,9 +153,13 @@ for strategy in strategies + [' Combined ']:
 
 risk_ruin_monte_carlo_df.to_csv('risk_ruin_monte_carlo_analysis.csv')
 
+
+#Plotting
+df['Start Time'] = pd.to_datetime(df['Date/Time of Trade'].str.split(' - ').str[0], format='%m/%d/%Y %H:%M')
+
 # Define the data for each strategy
-rsi_ma_data = df[df['Strategy Identifier'] == 'RSI_MA']
-bollinger_rsi_data = df[df['Strategy Identifier'] == 'Bollinger_RSI']
+rsi_ma_data = df[df['Strategy Identifier'] == 'RSI_MA'].set_index('Start Time')
+bollinger_rsi_data = df[df['Strategy Identifier'] == 'Bollinger_RSI'].set_index('Start Time')
 combined_data = pd.concat([rsi_ma_data, bollinger_rsi_data])
 
 # Function to calculate drawdown in %
@@ -173,7 +177,8 @@ plt.title('Account Balance Growth')
 plt.xlabel('Date')
 plt.ylabel('Balance')
 plt.legend()
-plt.savefig('account_balance_growth.png')
+plt.xticks([]) 
+plt.savefig('account_balance_growth_corrected.png')
 plt.close()
 
 # Plot Drawdown in % for each strategy
@@ -186,5 +191,6 @@ plt.xlabel('Date')
 plt.ylabel('Drawdown %')
 plt.legend()
 plt.ylim(-20, 35)  # Set y-axis limits if necessary
-plt.savefig('drawdown.png')
+plt.xticks([]) 
+plt.savefig('drawdown_corrected.png')
 plt.close()
