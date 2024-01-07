@@ -155,9 +155,26 @@ risk_ruin_monte_carlo_df.to_csv('risk_ruin_monte_carlo_analysis.csv')
 
 # Function to calculate combined account balance
 def calculate_combined_balance(rsi_ma_df, bollinger_rsi_df):
-    combined_df = rsi_ma_df[['Cumulative Profit/Loss']].copy()
-    combined_df['Bollinger_RSI Cumulative'] = bollinger_rsi_df['Cumulative Profit/Loss']
-    combined_df['Combined Cumulative'] = combined_df.sum(axis=1)
+    # Reset indices to ensure uniqueness
+    rsi_ma_df = rsi_ma_df.reset_index()
+    bollinger_rsi_df = bollinger_rsi_df.reset_index()
+
+    # Check if the dataframes have the same length
+    if len(rsi_ma_df) != len(bollinger_rsi_df):
+        print("Warning: DataFrames have different lengths. Combined calculation may not be accurate.")
+
+    # Use the smaller length for the combined calculation
+    length = min(len(rsi_ma_df), len(bollinger_rsi_df))
+
+    # Calculate the combined cumulative profit/loss
+    combined_cumulative = rsi_ma_df['Cumulative Profit/Loss'][:length] + bollinger_rsi_df['Cumulative Profit/Loss'][:length]
+    
+    # Create a new DataFrame for combined data
+    combined_df = pd.DataFrame({
+        'Start Time': rsi_ma_df['Start Time'][:length],
+        'Combined Cumulative': combined_cumulative
+    }).set_index('Start Time')
+
     return combined_df
     
 #Plotting
