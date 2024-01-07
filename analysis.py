@@ -158,8 +158,9 @@ df['Start Time'] = pd.to_datetime(df['Date/Time of Trade'].str.split(' - ').str[
 df.set_index('Start Time', inplace=True)
 
 # Define the data for each strategy
-rsi_ma_data = df[df['Strategy Identifier'] == 'RSI_MA']
-bollinger_rsi_data = df[df['Strategy Identifier'] == 'Bollinger_RSI']
+rsi_ma_data = df[df['Strategy Identifier'] == 'RSI_MA'].resample('D').ffill()
+bollinger_rsi_data = df[df['Strategy Identifier'] == 'Bollinger_RSI'].resample('D').ffill()
+combined_data = df.resample('D').ffill()
 
 # Function to calculate drawdown in %
 def calculate_drawdown(data):
@@ -169,7 +170,7 @@ def calculate_drawdown(data):
 
 # Plot Account Balance Growth for each strategy and combined
 plt.figure(figsize=(10, 6))
-plt.plot(df['Cumulative Profit/Loss'], label='Combined', color='blue')
+plt.plot(combined_data['Cumulative Profit/Loss'], label='Combined', color='blue')
 plt.plot(rsi_ma_data['Cumulative Profit/Loss'], label='RSI_MA', color='green')
 plt.plot(bollinger_rsi_data['Cumulative Profit/Loss'], label='Bollinger_RSI', color='red')
 plt.title('Account Balance Growth')
@@ -177,12 +178,12 @@ plt.xlabel('Date')
 plt.ylabel('Balance')
 plt.legend()
 plt.xticks([])
-plt.savefig('account_balance_growth_corrected.png')
+plt.savefig('account_balance_growth.png')
 plt.close()
 
 # Plot Drawdown in % for each strategy and combined
 plt.figure(figsize=(10, 6))
-plt.plot(calculate_drawdown(df), label='Combined', color='blue')
+plt.plot(calculate_drawdown(combined_data), label='Combined', color='blue')
 plt.plot(calculate_drawdown(rsi_ma_data), label='RSI_MA', color='green')
 plt.plot(calculate_drawdown(bollinger_rsi_data), label='Bollinger_RSI', color='red')
 plt.title('Drawdown in %')
@@ -191,5 +192,5 @@ plt.ylabel('Drawdown %')
 plt.legend()
 plt.ylim(-20, 35)  # Set y-axis limits if necessary
 plt.xticks([])
-plt.savefig('drawdown_corrected.png')
+plt.savefig('drawdown.png')
 plt.close()
