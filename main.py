@@ -98,7 +98,14 @@ def main():
     trade_results_df = pd.DataFrame(trade_results)
     trade_results_df.to_csv('trade_results.csv', index=False)
 
-    organized_trade_results_df = trade_results_df.sort_values(by='Date/Time of Trade')
+
+    # Extract start date/time from 'Date/Time of Trade' for sorting
+    trade_results_df['Start Time'] = pd.to_datetime(trade_results_df['Date/Time of Trade'].str.split(' - ').str[0],format='%m/%d/%Y %H:%M')
+
+    # Sort by 'Start Time'
+    organized_trade_results_df = trade_results_df.sort_values(by='Start Time')
+
+    # Cumulative Profit/Loss calculation
     organized_trade_results_df['Cumulative Profit/Loss'] = organized_trade_results_df['Profit/Loss'].cumsum() + config.INITIAL_CAPITAL
     organized_trade_results_df.to_csv('trade_results_Organised.csv', index=False)
 
