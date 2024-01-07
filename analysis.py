@@ -18,7 +18,7 @@ def convert_to_floats(return_string):
 
 # Load and process daily returns
 daily_returns_df = pd.read_csv('daily_returns.csv')
-daily_returns_df['Day/Date'] = pd.to_datetime(daily_returns_df['Day/Date'])
+daily_returns_df['Day/Date'] = pd.to_datetime(daily_returns_df['Day/Date'], format = '%d/%m/%Y')
 
 # Convert return data to numeric format
 for column in daily_returns_df.columns:
