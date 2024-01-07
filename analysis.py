@@ -153,17 +153,23 @@ for strategy in strategies + [' Combined ']:
 
 risk_ruin_monte_carlo_df.to_csv('risk_ruin_monte_carlo_analysis.csv')
   
-#Plotting
+#Plotting: Convert 'Date/Time of Trade' to datetime
 df['Start Time'] = pd.to_datetime(df['Date/Time of Trade'].str.split(' - ').str[0], format='%m/%d/%Y %H:%M')
-df.set_index('Start Time', inplace=True)
 
 # Ensure unique indices by taking the last entry of each day
-df = df.groupby(df.index).last()
+df = df.groupby('Start Time').last()
+
+# Define the complete date range for the dataset
+full_date_range = pd.date_range(start=df.index.min(), end=df.index.max(), freq='D')
 
 # Define the data for each strategy
-rsi_ma_data = df[df['Strategy Identifier'] == 'RSI_MA'].resample('D').ffill()
-bollinger_rsi_data = df[df['Strategy Identifier'] == 'Bollinger_RSI'].resample('D').ffill()
-combined_data = df.resample('D').ffill()
+rsi_ma_data = df[df['Strategy Identifier'] == 'RSI_MA']
+bollinger_rsi_data = df[df['Strategy Identifier'] == 'Bollinger_RSI']
+
+# Resample and forward fill the data for each strategy over the full date range
+rsi_ma_data = rsi_ma_data.reindex(full_date_range, method='ffill')
+bollinger_rsi_data = bollinger_rsi_data.reindex(full_date_range, method='ffill')
+combined_data = df.reindex(full_date_range, method='ffill')
 
 # Function to calculate drawdown in %
 def calculate_drawdown(data):
@@ -193,7 +199,7 @@ plt.title('Drawdown in %')
 plt.xlabel('Date')
 plt.ylabel('Drawdown %')
 plt.legend()
-plt.ylim(-20, 35)  # Set y-axis limits if necessary
+plt.ylim(-5, 50)  # Set y-axis limits if necessary
 plt.xticks([])
 plt.savefig('drawdown.png')
 plt.close()
