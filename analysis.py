@@ -155,9 +155,10 @@ risk_ruin_monte_carlo_df.to_csv('risk_ruin_monte_carlo_analysis.csv')
   
 #Plotting: Convert 'Date/Time of Trade' to datetime
 df['Start Time'] = pd.to_datetime(df['Date/Time of Trade'].str.split(' - ').str[0], format='%m/%d/%Y %H:%M')
+df.set_index('Start Time', inplace=True)
 
 # Ensure unique indices by taking the last entry of each day
-df = df.groupby('Start Time').last()
+df = df.groupby(df.index).last()
 
 # Define the complete date range for the dataset
 full_date_range = pd.date_range(start=df.index.min(), end=df.index.max(), freq='D')
@@ -166,10 +167,11 @@ full_date_range = pd.date_range(start=df.index.min(), end=df.index.max(), freq='
 rsi_ma_data = df[df['Strategy Identifier'] == 'RSI_MA']
 bollinger_rsi_data = df[df['Strategy Identifier'] == 'Bollinger_RSI']
 
-# Resample and forward fill the data for each strategy over the full date range
-rsi_ma_data = rsi_ma_data.reindex(full_date_range, method='ffill')
-bollinger_rsi_data = bollinger_rsi_data.reindex(full_date_range, method='ffill')
-combined_data = df.reindex(full_date_range, method='ffill')
+# Create a DataFrame with the full date range
+full_date_df = pd.DataFrame(index=full_date_range)
+
+# Merge the Bollinger data with the full date DataFrame
+bollinger_rsi_full = full_date_df.join(bollinger_rsi_data, how='left').ffill()
 
 # Function to calculate drawdown in %
 def calculate_drawdown(data):
@@ -179,9 +181,9 @@ def calculate_drawdown(data):
 
 # Plot Account Balance Growth for each strategy and combined
 plt.figure(figsize=(10, 6))
-plt.plot(combined_data['Cumulative Profit/Loss'], label='Combined', color='blue')
+plt.plot(df['Cumulative Profit/Loss'], label='Combined', color='blue')
 plt.plot(rsi_ma_data['Cumulative Profit/Loss'], label='RSI_MA', color='green')
-plt.plot(bollinger_rsi_data['Cumulative Profit/Loss'], label='Bollinger_RSI', color='red')
+plt.plot(bollinger_rsi_full['Cumulative Profit/Loss'], label='Bollinger_RSI', color='red')
 plt.title('Account Balance Growth')
 plt.xlabel('Date')
 plt.ylabel('Balance')
@@ -192,9 +194,9 @@ plt.close()
 
 # Plot Drawdown in % for each strategy and combined
 plt.figure(figsize=(10, 6))
-plt.plot(calculate_drawdown(combined_data), label='Combined', color='blue')
+plt.plot(calculate_drawdown(df), label='Combined', color='blue')
 plt.plot(calculate_drawdown(rsi_ma_data), label='RSI_MA', color='green')
-plt.plot(calculate_drawdown(bollinger_rsi_data), label='Bollinger_RSI', color='red')
+plt.plot(calculate_drawdown(bollinger_rsi_full), label='Bollinger_RSI', color='red')
 plt.title('Drawdown in %')
 plt.xlabel('Date')
 plt.ylabel('Drawdown %')
